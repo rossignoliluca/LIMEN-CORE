@@ -1,0 +1,31 @@
+{
+  "name": "enoq-core",
+  "version": "1.0.0",
+  "description": "ENOQ - Constitutional Cognitive Companion",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "start": "ts-node src/cli.ts",
+    "cli": "ts-node src/cli.ts",
+    "test": "ts-node src/test_pipeline.ts",
+    "test:all": "ts-node src/test_S5_verify.ts && ts-node src/test_meta_kernel.ts && ts-node src/test_l2_execution.ts && ts-node src/test_pipeline.ts",
+    "test:s5": "ts-node src/test_S5_verify.ts",
+    "test:metakernel": "ts-node src/test_meta_kernel.ts",
+    "test:l2": "ts-node src/test_l2_execution.ts",
+    "test:pipeline": "ts-node src/test_pipeline.ts"
+  },
+  "keywords": [
+    "enoq",
+    "cognitive-companion",
+    "ai-ethics",
+    "decision-support"
+  ],
+  "author": "Luca Rossignoli",
+  "license": "UNLICENSED",
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "ts-node": "^10.9.0",
+    "typescript": "^5.0.0"
+  }
+}
