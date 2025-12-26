@@ -1,0 +1,724 @@
+/**
+ * ENOQ DIMENSIONAL SYSTEM
+ *
+ * Multidimensional detection and integration:
+ * - Vertical Dimensions: Somatic → Functional → Relational → Existential → Transcendent
+ * - Horizontal Dimensions: H01-H17 Human Domains
+ *
+ * Based on:
+ * - Integrated Information Theory (Φ for integration measure)
+ * - Existential psychology (Yalom's four givens)
+ * - Humanistic psychology (Maslow's hierarchy, updated)
+ * - Enactivism (embodied, embedded, enacted, extended)
+ *
+ * Constitutional Note: Higher dimensions (Existential, Transcendent)
+ * trigger V_MODE automatically - enhanced constitutional protection.
+ */
+
+import { HumanDomain, FieldState, SupportedLanguage } from './types';
+
+// ============================================
+// TYPES
+// ============================================
+
+export type VerticalDimension =
+  | 'SOMATIC'       // Body, sensation, energy, health
+  | 'FUNCTIONAL'    // Goals, problems, resources, actions
+  | 'RELATIONAL'    // Self-other, attachment, power, love
+  | 'EXISTENTIAL'   // Identity, death, freedom, isolation, meaning
+  | 'TRANSCENDENT'; // Purpose beyond self, connection to whole
+
+export interface DimensionalState {
+  // Vertical activation (0-1 for each)
+  vertical: Record<VerticalDimension, number>;
+
+  // Horizontal activation (0-1 for each H01-H17)
+  horizontal: Record<HumanDomain, number>;
+
+  // Integration metrics
+  integration: IntegrationMetrics;
+
+  // Dominant dimensions
+  primary_vertical: VerticalDimension;
+  primary_horizontal: HumanDomain[];
+
+  // Special flags
+  v_mode_triggered: boolean;
+  emergency_detected: boolean;
+  cross_dimensional: boolean;  // Multiple dimensions strongly active
+}
+
+export interface IntegrationMetrics {
+  // Φ-inspired measure: how interconnected are the active dimensions?
+  phi: number;  // 0-1
+
+  // Complexity: how many dimensions are active?
+  complexity: number;
+
+  // Coherence: do the active dimensions make sense together?
+  coherence: number;
+
+  // Tension: are there conflicting dimensions?
+  tension: number;
+}
+
+// ============================================
+// VERTICAL DIMENSION MARKERS
+// ============================================
+
+const VERTICAL_MARKERS: Record<VerticalDimension, {
+  keywords: RegExp[];
+  phrases: RegExp[];
+  semantic_fields: string[];
+}> = {
+  SOMATIC: {
+    keywords: [
+      /body|corpo|cuerpo|身体|शरीर/i,
+      /tired|stanco|cansado|疲れ|थका/i,
+      /energy|energia|energía|エネルギー|ऊर्जा/i,
+      /pain|dolore|dolor|痛み|दर्द/i,
+      /sleep|dormire|dormir|眠り|नींद/i,
+      /health|salute|salud|健康|स्वास्थ्य/i,
+      /breathe|respirare|respirar|呼吸|सांस/i,
+      /feel|sentire|sentir|感じる|महसूस/i,
+      /tension|tensione|tensión|緊張|तनाव/i,
+      /stomach|stomaco|estómago|胃|पेट/i,
+      /heart|cuore|corazón|心臓|दिल/i,
+      /chest|petto|pecho|胸|छाती/i
+    ],
+    phrases: [
+      /my body|il mio corpo|mi cuerpo/i,
+      /physically|fisicamente|físicamente/i,
+      /can't sleep|non riesco a dormire|no puedo dormir/i,
+      /no energy|senza energia|sin energía/i
+    ],
+    semantic_fields: ['physical', 'sensation', 'embodiment', 'vitality']
+  },
+
+  FUNCTIONAL: {
+    keywords: [
+      /goal|obiettivo|objetivo|目標|लक्ष्य/i,
+      /problem|problema|problema|問題|समस्या/i,
+      /solution|soluzione|solución|解決|समाधान/i,
+      /plan|piano|plan|計画|योजना/i,
+      /task|compito|tarea|タスク|कार्य/i,
+      /work|lavoro|trabajo|仕事|काम/i,
+      /money|soldi|dinero|お金|पैसा/i,
+      /time|tempo|tiempo|時間|समय/i,
+      /decide|decidere|decidir|決める|निर्णय/i,
+      /organize|organizzare|organizar|整理/i,
+      /manage|gestire|gestionar|管理/i
+    ],
+    phrases: [
+      /how to|come fare|cómo hacer|どうやって/i,
+      /I need to|devo|necesito|しなければ/i,
+      /what should I|cosa dovrei|qué debería/i,
+      /step by step|passo dopo passo|paso a paso/i
+    ],
+    semantic_fields: ['instrumental', 'practical', 'operational', 'resource']
+  },
+
+  RELATIONAL: {
+    keywords: [
+      /relationship|relazione|relación|関係|रिश्ता/i,
+      /friend|amico|amigo|友達|दोस्त/i,
+      /family|famiglia|familia|家族|परिवार/i,
+      /partner|partner|pareja|パートナー|साथी/i,
+      /love|amore|amor|愛|प्यार/i,
+      /trust|fiducia|confianza|信頼|विश्वास/i,
+      /betray|tradire|traicionar|裏切り|धोखा/i,
+      /lonely|solo|solitario|孤独|अकेला/i,
+      /together|insieme|juntos|一緒に|साथ/i,
+      /connect|collegare|conectar|つながる|जुड़ना/i,
+      /understand|capire|entender|理解する|समझना/i,
+      /abandon|abbandonare|abandonar|見捨てる|छोड़ना/i
+    ],
+    phrases: [
+      /between us|tra noi|entre nosotros/i,
+      /they don't|loro non|ellos no/i,
+      /she said|lei ha detto|ella dijo/i,
+      /he thinks|lui pensa|él piensa/i,
+      /we used to|noi eravamo soliti|solíamos/i
+    ],
+    semantic_fields: ['interpersonal', 'attachment', 'social', 'belonging']
+  },
+
+  EXISTENTIAL: {
+    keywords: [
+      /meaning|significato|significado|意味|अर्थ/i,
+      /purpose|scopo|propósito|目的|उद्देश्य/i,
+      /death|morte|muerte|死|मृत्यु/i,
+      /die|morire|morir|死ぬ|मरना/i,
+      /identity|identità|identidad|アイデンティティ|पहचान/i,
+      /who am I|chi sono|quién soy|私は誰/i,
+      /freedom|libertà|libertad|自由|स्वतंत्रता/i,
+      /choice|scelta|elección|選択|चुनाव/i,
+      /alone|solo|solo|一人|अकेला/i,
+      /exist|esistere|existir|存在する|अस्तित्व/i,
+      /authentic|autentico|auténtico|本物の|प्रामाणिक/i,
+      /real|vero|real|本当の|असली/i,
+      /void|vuoto|vacío|虚無|शून्य/i,
+      /nothing|niente|nada|何もない|कुछ नहीं/i
+    ],
+    phrases: [
+      /what's the point|qual è il senso|cuál es el sentido/i,
+      /why am I|perché sono|por qué soy/i,
+      /does it matter|importa|importa/i,
+      /who I really am|chi sono veramente|quién soy realmente/i,
+      /my life|la mia vita|mi vida/i,
+      /before I die|prima di morire|antes de morir/i
+    ],
+    semantic_fields: ['meaning', 'mortality', 'identity', 'freedom', 'isolation']
+  },
+
+  TRANSCENDENT: {
+    keywords: [
+      /universe|universo|universo|宇宙|ब्रह्मांड/i,
+      /infinite|infinito|infinito|無限|अनंत/i,
+      /spirit|spirito|espíritu|精神|आत्मा/i,
+      /soul|anima|alma|魂|आत्मा/i,
+      /divine|divino|divino|神聖な|दिव्य/i,
+      /eternal|eterno|eterno|永遠の|शाश्वत/i,
+      /sacred|sacro|sagrado|神聖な|पवित्र/i,
+      /consciousness|coscienza|conciencia|意識|चेतना/i,
+      /enlighten|illuminare|iluminar|悟る|प्रबुद्ध/i,
+      /transcend|trascendere|trascender|超越する|पार करना/i,
+      /oneness|unità|unidad|一体|एकता/i,
+      /cosmic|cosmico|cósmico|宇宙的/i
+    ],
+    phrases: [
+      /connected to everything|connesso a tutto|conectado a todo/i,
+      /part of something|parte di qualcosa|parte de algo/i,
+      /bigger than|più grande di|más grande que/i,
+      /beyond myself|oltre me stesso|más allá de mí/i,
+      /the whole|il tutto|el todo/i
+    ],
+    semantic_fields: ['spiritual', 'cosmic', 'unity', 'ultimate']
+  }
+};
+
+// ============================================
+// HORIZONTAL DOMAIN MARKERS (Extended)
+// Aligned with types.ts HumanDomain ontology
+// ============================================
+
+const HORIZONTAL_MARKERS: Record<HumanDomain, {
+  keywords: RegExp[];
+  context_clues: string[];
+}> = {
+  H01_SURVIVAL: {
+    keywords: [/survive|sopravvivere|threat|minaccia|danger|pericolo|crisis|crisi|emergency|emergenza/i],
+    context_clues: ['immediate threat', 'life or death', 'basic needs']
+  },
+  H02_SAFETY: {
+    keywords: [/safe|sicuro|protect|proteggere|security|sicurezza|stable|stabile|fear|paura/i],
+    context_clues: ['stability', 'predictability', 'protection']
+  },
+  H03_BODY: {
+    keywords: [/body|corpo|health|salute|physical|fisico|exercise|esercizio|eating|mangiare/i],
+    context_clues: ['physical wellbeing', 'body image', 'health habits']
+  },
+  H04_EMOTION: {
+    keywords: [/feel|sentire|emotion|emozione|angry|arrabbiato|sad|triste|happy|felice|fear|paura/i],
+    context_clues: ['emotional states', 'feelings', 'affect']
+  },
+  H05_COGNITION: {
+    keywords: [/think|pensare|understand|capire|confuse|confuso|decide|decidere|learn|imparare/i],
+    context_clues: ['thinking', 'understanding', 'mental processes']
+  },
+  H06_MEANING: {
+    keywords: [/meaning|significato|purpose|scopo|why|perché|sense|senso|matter|importa/i],
+    context_clues: ['meaning-making', 'purpose', 'significance']
+  },
+  H07_IDENTITY: {
+    keywords: [/who am I|chi sono|identity|identità|self|io|authentic|autentico|real me|vero me/i],
+    context_clues: ['self-concept', 'identity', 'authenticity']
+  },
+  H08_TEMPORAL: {
+    keywords: [/deadline|scadenza|time|tempo|urgent|urgente|pressure|pressione|wait|aspettare/i],
+    context_clues: ['time pressure', 'deadlines', 'temporal concerns']
+  },
+  H09_ATTACHMENT: {
+    keywords: [/close|vicino|trust|fiducia|bond|legame|abandon|abbandonare|need|bisogno/i],
+    context_clues: ['attachment', 'bonding', 'connection needs']
+  },
+  H10_COORDINATION: {
+    keywords: [/together|insieme|cooperate|cooperare|team|squadra|coordinate|coordinare/i],
+    context_clues: ['coordination', 'cooperation', 'teamwork']
+  },
+  H11_BELONGING: {
+    keywords: [/belong|appartenere|community|comunità|group|gruppo|included|incluso|outsider|estraneo/i],
+    context_clues: ['social inclusion', 'group identity', 'acceptance']
+  },
+  H12_HIERARCHY: {
+    keywords: [/boss|capo|power|potere|authority|autorità|control|controllo|status|status/i],
+    context_clues: ['power dynamics', 'hierarchy', 'authority']
+  },
+  H13_CREATION: {
+    keywords: [/create|creare|make|fare|build|costruire|express|esprimere|art|arte/i],
+    context_clues: ['creativity', 'making', 'expression']
+  },
+  H14_WORK: {
+    keywords: [/work|lavoro|job|impiego|career|carriera|profession|professione|office|ufficio/i],
+    context_clues: ['employment', 'professional life', 'career']
+  },
+  H15_LEGAL: {
+    keywords: [/law|legge|legal|legale|rights|diritti|court|tribunale|lawyer|avvocato/i],
+    context_clues: ['legal matters', 'rights', 'compliance']
+  },
+  H16_OPERATIONAL: {
+    keywords: [/task|compito|do|fare|complete|completare|finish|finire|step|passo/i],
+    context_clues: ['task execution', 'operations', 'getting things done']
+  },
+  H17_FORM: {
+    keywords: [/beauty|bellezza|aesthetic|estetico|form|forma|design|design|harmony|armonia|density|densità/i],
+    context_clues: ['form', 'aesthetics', 'meta-structure']
+  }
+};
+
+// ============================================
+// DIMENSIONAL DETECTOR
+// ============================================
+
+export class DimensionalDetector {
+  /**
+   * Detect dimensional state from message and context
+   */
+  detect(
+    message: string,
+    language: SupportedLanguage,
+    context?: {
+      previous_state?: DimensionalState;
+      field_state?: FieldState;
+    }
+  ): DimensionalState {
+    // Detect vertical dimensions
+    const vertical = this.detectVertical(message);
+
+    // Detect horizontal dimensions
+    const horizontal = this.detectHorizontal(message);
+
+    // Compute integration metrics
+    const integration = this.computeIntegration(vertical, horizontal);
+
+    // Find primary dimensions
+    const primary_vertical = this.findPrimaryVertical(vertical);
+    const primary_horizontal = this.findPrimaryHorizontal(horizontal);
+
+    // Check special conditions
+    const v_mode_triggered =
+      vertical.EXISTENTIAL > 0.5 ||
+      vertical.TRANSCENDENT > 0.5;
+
+    const emergency_detected =
+      vertical.SOMATIC > 0.7 && this.detectEmergencyMarkers(message);
+
+    const cross_dimensional = integration.complexity > 2;
+
+    // Apply temporal smoothing if previous state exists
+    if (context?.previous_state) {
+      this.applyTemporalSmoothing(vertical, context.previous_state.vertical);
+      this.applyTemporalSmoothing(horizontal, context.previous_state.horizontal);
+    }
+
+    return {
+      vertical,
+      horizontal,
+      integration,
+      primary_vertical,
+      primary_horizontal,
+      v_mode_triggered,
+      emergency_detected,
+      cross_dimensional
+    };
+  }
+
+  /**
+   * Detect vertical dimension activations
+   */
+  private detectVertical(message: string): Record<VerticalDimension, number> {
+    const result: Record<VerticalDimension, number> = {
+      SOMATIC: 0,
+      FUNCTIONAL: 0,
+      RELATIONAL: 0,
+      EXISTENTIAL: 0,
+      TRANSCENDENT: 0
+    };
+
+    for (const [dimension, markers] of Object.entries(VERTICAL_MARKERS)) {
+      let score = 0;
+      let matches = 0;
+
+      // Check keywords
+      for (const keyword of markers.keywords) {
+        if (keyword.test(message)) {
+          matches++;
+          score += 0.15;
+        }
+      }
+
+      // Check phrases (higher weight)
+      for (const phrase of markers.phrases) {
+        if (phrase.test(message)) {
+          matches++;
+          score += 0.25;
+        }
+      }
+
+      // Normalize and cap at 1
+      result[dimension as VerticalDimension] = Math.min(1, score);
+    }
+
+    return result;
+  }
+
+  /**
+   * Detect horizontal domain activations
+   */
+  private detectHorizontal(message: string): Record<HumanDomain, number> {
+    const result: Record<HumanDomain, number> = {} as Record<HumanDomain, number>;
+
+    for (const domain of Object.keys(HORIZONTAL_MARKERS) as HumanDomain[]) {
+      const markers = HORIZONTAL_MARKERS[domain];
+      let score = 0;
+
+      for (const keyword of markers.keywords) {
+        if (keyword.test(message)) {
+          score += 0.3;
+        }
+      }
+
+      result[domain] = Math.min(1, score);
+    }
+
+    return result;
+  }
+
+  /**
+   * Compute integration metrics (Φ-inspired)
+   */
+  private computeIntegration(
+    vertical: Record<VerticalDimension, number>,
+    horizontal: Record<HumanDomain, number>
+  ): IntegrationMetrics {
+    // Count active dimensions
+    const activeVertical = Object.values(vertical).filter(v => v > 0.3).length;
+    const activeHorizontal = Object.values(horizontal).filter(v => v > 0.3).length;
+
+    // Complexity = total active dimensions
+    const complexity = activeVertical + activeHorizontal;
+
+    // Phi = integration measure
+    // High phi when multiple dimensions are active AND coherent
+    const phi = this.computePhi(vertical, horizontal);
+
+    // Coherence = do the dimensions make sense together?
+    const coherence = this.computeCoherence(vertical, horizontal);
+
+    // Tension = conflicting dimensions
+    const tension = this.computeTension(vertical, horizontal);
+
+    return { phi, complexity, coherence, tension };
+  }
+
+  /**
+   * Compute Φ (integrated information)
+   * Higher when dimensions are both differentiated AND integrated
+   */
+  private computePhi(
+    vertical: Record<VerticalDimension, number>,
+    horizontal: Record<HumanDomain, number>
+  ): number {
+    const verticalValues = Object.values(vertical);
+    const horizontalValues = Object.values(horizontal);
+    const allValues = [...verticalValues, ...horizontalValues];
+
+    // Differentiation: variance in activations
+    const mean = allValues.reduce((a, b) => a + b, 0) / allValues.length;
+    const variance = allValues.reduce((a, b) => a + Math.pow(b - mean, 2), 0) / allValues.length;
+
+    // Integration: correlation between dimensions
+    // (Simplified: sum of products of co-active dimensions)
+    let integration = 0;
+    for (let i = 0; i < allValues.length; i++) {
+      for (let j = i + 1; j < allValues.length; j++) {
+        if (allValues[i] > 0.3 && allValues[j] > 0.3) {
+          integration += allValues[i] * allValues[j];
+        }
+      }
+    }
+
+    // Phi = differentiation * integration (normalized)
+    const phi = Math.sqrt(variance) * Math.min(1, integration / 5);
+    return Math.min(1, phi);
+  }
+
+  /**
+   * Compute coherence between dimensions
+   */
+  private computeCoherence(
+    vertical: Record<VerticalDimension, number>,
+    horizontal: Record<HumanDomain, number>
+  ): number {
+    // Define natural pairings (aligned with types.ts HumanDomain)
+    const pairings: [VerticalDimension, HumanDomain[]][] = [
+      ['SOMATIC', ['H03_BODY', 'H01_SURVIVAL', 'H04_EMOTION']],
+      ['FUNCTIONAL', ['H14_WORK', 'H16_OPERATIONAL', 'H08_TEMPORAL']],
+      ['RELATIONAL', ['H11_BELONGING', 'H09_ATTACHMENT', 'H10_COORDINATION']],
+      ['EXISTENTIAL', ['H06_MEANING', 'H07_IDENTITY', 'H13_CREATION']],
+      ['TRANSCENDENT', ['H06_MEANING', 'H17_FORM']]
+    ];
+
+    let coherenceScore = 0;
+    let count = 0;
+
+    for (const [vert, horz] of pairings) {
+      if (vertical[vert] > 0.3) {
+        for (const h of horz) {
+          if (horizontal[h] > 0.3) {
+            coherenceScore += 1;
+          }
+          count++;
+        }
+      }
+    }
+
+    return count > 0 ? coherenceScore / count : 0.5;
+  }
+
+  /**
+   * Compute tension between dimensions
+   */
+  private computeTension(
+    vertical: Record<VerticalDimension, number>,
+    horizontal: Record<HumanDomain, number>
+  ): number {
+    let tension = 0;
+
+    // Tension: high functional + high existential = inner conflict
+    if (vertical.FUNCTIONAL > 0.5 && vertical.EXISTENTIAL > 0.5) {
+      tension += 0.3;
+    }
+
+    // Tension: high somatic distress + high work focus
+    if (vertical.SOMATIC > 0.5 && horizontal.H14_WORK > 0.5) {
+      tension += 0.2;
+    }
+
+    // Tension: high attachment need + high isolation (existential)
+    if (horizontal.H09_ATTACHMENT > 0.5 && vertical.EXISTENTIAL > 0.5) {
+      tension += 0.2;
+    }
+
+    return Math.min(1, tension);
+  }
+
+  /**
+   * Find primary vertical dimension
+   */
+  private findPrimaryVertical(vertical: Record<VerticalDimension, number>): VerticalDimension {
+    let max = 0;
+    let primary: VerticalDimension = 'FUNCTIONAL';
+
+    for (const [dim, value] of Object.entries(vertical)) {
+      if (value > max) {
+        max = value;
+        primary = dim as VerticalDimension;
+      }
+    }
+
+    return primary;
+  }
+
+  /**
+   * Find primary horizontal dimensions (can be multiple)
+   */
+  private findPrimaryHorizontal(horizontal: Record<HumanDomain, number>): HumanDomain[] {
+    const threshold = 0.3;
+    const active: [HumanDomain, number][] = [];
+
+    for (const [domain, value] of Object.entries(horizontal)) {
+      if (value > threshold) {
+        active.push([domain as HumanDomain, value]);
+      }
+    }
+
+    // Sort by activation and return top 3
+    active.sort((a, b) => b[1] - a[1]);
+    return active.slice(0, 3).map(([d]) => d);
+  }
+
+  /**
+   * Detect emergency markers
+   */
+  private detectEmergencyMarkers(message: string): boolean {
+    const emergencyPatterns = [
+      /help me|aiutami|ayúdame/i,
+      /can't breathe|non riesco a respirare|no puedo respirar/i,
+      /going to die|sto per morire|voy a morir/i,
+      /kill myself|uccidermi|matarme/i,
+      /end it|farla finita|acabar/i,
+      /hurt myself|farmi del male|hacerme daño/i,
+      /panic|panico|pánico/i,
+      /heart attack|infarto|ataque al corazón/i
+    ];
+
+    return emergencyPatterns.some(p => p.test(message));
+  }
+
+  /**
+   * Apply temporal smoothing to prevent abrupt changes
+   */
+  private applyTemporalSmoothing(
+    current: Record<string, number>,
+    previous: Record<string, number>,
+    alpha: number = 0.3
+  ): void {
+    for (const key of Object.keys(current)) {
+      if (previous[key] !== undefined) {
+        (current as Record<string, number>)[key] = alpha * current[key] + (1 - alpha) * previous[key];
+      }
+    }
+  }
+}
+
+// ============================================
+// DIMENSIONAL INTEGRATOR
+// ============================================
+
+export class DimensionalIntegrator {
+  /**
+   * Generate insights from dimensional state
+   */
+  generateInsights(state: DimensionalState): DimensionalInsight[] {
+    const insights: DimensionalInsight[] = [];
+
+    // Cross-dimensional insight
+    if (state.cross_dimensional) {
+      insights.push({
+        type: 'cross_dimensional',
+        description: 'Multiple life dimensions are active simultaneously',
+        dimensions: [...Object.entries(state.vertical)
+          .filter(([, v]) => v > 0.3)
+          .map(([d]) => d)],
+        implication: 'This may indicate an interconnected situation that spans multiple areas of life'
+      });
+    }
+
+    // Tension insight
+    if (state.integration.tension > 0.3) {
+      insights.push({
+        type: 'tension',
+        description: 'There appears to be tension between different aspects',
+        dimensions: [],
+        implication: 'Inner conflict may be present between what you need and what you\'re focused on'
+      });
+    }
+
+    // Depth insight (existential/transcendent active)
+    if (state.v_mode_triggered) {
+      insights.push({
+        type: 'depth',
+        description: 'This touches on fundamental questions of meaning or identity',
+        dimensions: ['EXISTENTIAL', 'TRANSCENDENT'],
+        implication: 'V_MODE: Enhanced reflection, no external answers can be given'
+      });
+    }
+
+    // Somatic insight
+    if (state.vertical.SOMATIC > 0.5) {
+      insights.push({
+        type: 'embodied',
+        description: 'The body is speaking',
+        dimensions: ['SOMATIC'],
+        implication: 'Physical sensations may be carrying important information'
+      });
+    }
+
+    return insights;
+  }
+
+  /**
+   * Suggest appropriate response depth
+   */
+  suggestDepth(state: DimensionalState): 'surface' | 'medium' | 'deep' {
+    // High integration = deep response needed
+    if (state.integration.phi > 0.6) return 'deep';
+
+    // Existential or transcendent = deep
+    if (state.v_mode_triggered) return 'deep';
+
+    // High complexity but low coherence = medium (need to clarify)
+    if (state.integration.complexity > 3 && state.integration.coherence < 0.5) {
+      return 'medium';
+    }
+
+    // Simple functional = surface
+    if (state.primary_vertical === 'FUNCTIONAL' && !state.cross_dimensional) {
+      return 'surface';
+    }
+
+    return 'medium';
+  }
+
+  /**
+   * Suggest primitives based on dimensional state
+   */
+  suggestPrimitives(state: DimensionalState): string[] {
+    const primitives: string[] = [];
+
+    // Based on vertical dimension
+    switch (state.primary_vertical) {
+      case 'SOMATIC':
+        primitives.push('GROUND', 'PRESENCE', 'BREATHE');
+        break;
+      case 'FUNCTIONAL':
+        primitives.push('FRAME', 'MAP', 'STRUCTURE');
+        break;
+      case 'RELATIONAL':
+        primitives.push('MIRROR', 'REFLECT', 'VALIDATE');
+        break;
+      case 'EXISTENTIAL':
+        primitives.push('WITNESS', 'HOLD', 'COMPANION');
+        break;
+      case 'TRANSCENDENT':
+        primitives.push('EXPAND', 'CONNECT', 'WONDER');
+        break;
+    }
+
+    // Cross-dimensional: add integration primitives
+    if (state.cross_dimensional) {
+      primitives.push('BRIDGE', 'INTEGRATE');
+    }
+
+    // High tension: add holding primitives
+    if (state.integration.tension > 0.3) {
+      primitives.push('HOLD_PARADOX', 'BOTH_AND');
+    }
+
+    return primitives;
+  }
+}
+
+// ============================================
+// INSIGHT TYPE
+// ============================================
+
+export interface DimensionalInsight {
+  type: 'cross_dimensional' | 'tension' | 'depth' | 'embodied' | 'relational' | 'functional';
+  description: string;
+  dimensions: string[];
+  implication: string;
+}
+
+// ============================================
+// SINGLETON EXPORTS
+// ============================================
+
+export const dimensionalDetector = new DimensionalDetector();
+export const dimensionalIntegrator = new DimensionalIntegrator();
+
+export default {
+  detector: dimensionalDetector,
+  integrator: dimensionalIntegrator
+};
