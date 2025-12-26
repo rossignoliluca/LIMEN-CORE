@@ -1,8 +1,8 @@
 /**
  * ENOQ L1 PIPELINE
- * 
+ *
  * The complete perception-action pipeline.
- * Input → Perception → Selection → Generation → Output
+ * Input → Gate → Perception → Selection → Generation → Verify → Output
  */
 
 import { perceive } from './perception';
@@ -90,5 +90,27 @@ export { perceive } from './perception';
 export { select } from './selection';
 export { generate } from './generation';
 export * from './types';
+
+// Gate client exports
+export {
+  GateClient,
+  GateResult,
+  GateSignalEffect,
+  interpretGateSignal,
+  getGateClient,
+  resetGateClient,
+  GateClientConfig,
+} from './gate_client';
+
+// Full pipeline exports
+export {
+  enoq,
+  createSession,
+  Session,
+  Turn,
+  PipelineTrace,
+  PipelineResult,
+  PipelineConfig,
+} from './pipeline';
 
 export default { process, respond, debug };

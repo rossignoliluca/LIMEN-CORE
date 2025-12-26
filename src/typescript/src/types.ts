@@ -268,11 +268,38 @@ export interface PipelineInput {
 
 export interface PipelineOutput {
   response: string;
-  
+
   // Trace (for debugging/audit)
   trace: {
     field_state: FieldState;
     selection: ProtocolSelection;
     generation: GenerationOutput;
   };
+}
+
+// ============================================
+// GATE TYPES (L0 Integration)
+// ============================================
+
+export type GateSignal =
+  | 'D1_ACTIVE'   // Operational Continuity
+  | 'D2_ACTIVE'   // Coordination
+  | 'D3_ACTIVE'   // Operative Selection
+  | 'D4_ACTIVE'   // Boundary
+  | 'NULL';       // No domain activated
+
+export type GateReasonCode =
+  | 'UNCLASSIFIABLE'
+  | 'AMBIGUOUS'
+  | 'NORMATIVE_REQUEST'
+  | 'INTEGRATION_REQUIRED'
+  | 'ZERO_PERTURBATION'
+  | 'DOMAIN_SIGNAL';
+
+export interface GateResult {
+  signal: GateSignal;
+  reason_code: GateReasonCode;
+  request_id: string;
+  latency_ms: number;
+  error?: string;
 }
