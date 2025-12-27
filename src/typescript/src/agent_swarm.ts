@@ -18,6 +18,7 @@
 
 import { HumanDomain, FieldState, SupportedLanguage } from './types';
 import { DimensionalState, VerticalDimension } from './dimensional_system';
+import { generateAgentResponse, generateContextualResponse, generateDomainResponse, ResponseContext } from './agent_responses';
 
 // ============================================
 // TYPES
@@ -465,7 +466,10 @@ class DomainSpecialistAgent extends BaseAgent {
   }
 
   private formatContribution(need: string, workspace: GlobalWorkspace): string {
-    return `[${this.domain}] Acknowledging: ${need}`;
+    // Get language from field state or default to English
+    const language = (workspace.spotlight.field_state?.language as SupportedLanguage) || 'en';
+    const variationIndex = Math.floor(this.state.activation_level * 10);
+    return generateDomainResponse(this.domain, language, variationIndex);
   }
 }
 
@@ -528,13 +532,29 @@ class TemporalAgent extends BaseAgent {
 
   contribute(workspace: GlobalWorkspace): string | null {
     const analysis = this.analyzeTemporalContent(workspace);
+    const state = workspace.spotlight.dimensional_state;
+    const language = (workspace.spotlight.field_state?.language as SupportedLanguage) || 'en';
+
+    const context: ResponseContext = {
+      language,
+      vertical: state.primary_vertical,
+      domains: state.primary_horizontal,
+      v_mode: state.v_mode_triggered,
+      emergency: state.emergency_detected,
+      arousal: 'medium',
+      phi: state.integration.phi,
+    };
 
     if (analysis.pattern_detected) {
-      return `[TEMPORAL] This seems to connect to a recurring theme`;
+      return generateAgentResponse('TEMPORAL', 'pattern', context);
     }
 
     if (analysis.future_concern) {
-      return `[TEMPORAL] The future dimension is present here`;
+      return generateAgentResponse('TEMPORAL', 'future', context);
+    }
+
+    if (analysis.past_reference) {
+      return generateAgentResponse('TEMPORAL', 'past', context);
     }
 
     return null;
@@ -651,13 +671,24 @@ class SynthesisAgent extends BaseAgent {
   contribute(workspace: GlobalWorkspace): string | null {
     // Synthesize all agent contributions
     const state = workspace.spotlight.dimensional_state;
+    const language = (workspace.spotlight.field_state?.language as SupportedLanguage) || 'en';
+
+    const context: ResponseContext = {
+      language,
+      vertical: state.primary_vertical,
+      domains: state.primary_horizontal,
+      v_mode: state.v_mode_triggered,
+      emergency: state.emergency_detected,
+      arousal: 'medium',
+      phi: state.integration.phi,
+    };
 
     if (state.integration.tension > 0.3) {
-      return `[SYNTHESIS] Multiple truths seem present here`;
+      return generateAgentResponse('SYNTHESIS', 'tension', context);
     }
 
     if (state.cross_dimensional) {
-      return `[SYNTHESIS] This touches several areas of life simultaneously`;
+      return generateAgentResponse('SYNTHESIS', 'integration', context);
     }
 
     return null;
@@ -671,21 +702,77 @@ class SynthesisAgent extends BaseAgent {
     workspace: GlobalWorkspace,
     primitive: string
   ): string {
-    // In production, this would be much more sophisticated
-    // using the LLM to weave contributions together
+    const state = workspace.spotlight.dimensional_state;
+    const language = (workspace.spotlight.field_state?.language as SupportedLanguage) || 'en';
 
+    // Collect all valid contributions
     const elements: string[] = [];
 
-    // Add relevant contributions (filtered by activation)
-    for (const [agentId, contribution] of contributions) {
-      if (contribution && !contribution.startsWith('[')) {
+    // Priority order based on dimensional state
+    const priorityAgents: AgentID[] = [];
+
+    // Emergency: Somatic first
+    if (state.emergency_detected) {
+      priorityAgents.push('SOMATIC_AGENT');
+    }
+
+    // V_MODE: Synthesis and existential domains
+    if (state.v_mode_triggered) {
+      priorityAgents.push('SYNTHESIS_AGENT', 'H06_MEANING', 'H07_IDENTITY');
+    }
+
+    // Add primary vertical's agent
+    switch (state.primary_vertical) {
+      case 'SOMATIC':
+        priorityAgents.push('SOMATIC_AGENT', 'H03_BODY');
+        break;
+      case 'FUNCTIONAL':
+        priorityAgents.push('H16_OPERATIONAL', 'H14_WORK');
+        break;
+      case 'RELATIONAL':
+        priorityAgents.push('H09_ATTACHMENT', 'H11_BELONGING');
+        break;
+      case 'EXISTENTIAL':
+        priorityAgents.push('H06_MEANING', 'H07_IDENTITY');
+        break;
+      case 'TRANSCENDENT':
+        priorityAgents.push('SYNTHESIS_AGENT', 'H06_MEANING');
+        break;
+    }
+
+    // Add temporal if patterns detected
+    priorityAgents.push('TEMPORAL_AGENT');
+
+    // Add synthesis for integration
+    if (state.cross_dimensional || state.integration.tension > 0.3) {
+      priorityAgents.push('SYNTHESIS_AGENT');
+    }
+
+    // Collect contributions in priority order (avoid duplicates)
+    const seen = new Set<string>();
+    for (const agentId of priorityAgents) {
+      const contribution = contributions.get(agentId);
+      if (contribution && !seen.has(contribution)) {
         elements.push(contribution);
+        seen.add(contribution);
+        // Limit to 2-3 elements for readability
+        if (elements.length >= 2) break;
       }
     }
 
-    // Fallback: return most relevant contribution
+    // If still empty, try any contribution
     if (elements.length === 0) {
-      return 'I hear you.';
+      for (const [agentId, contribution] of contributions) {
+        if (contribution && !seen.has(contribution)) {
+          elements.push(contribution);
+          break;
+        }
+      }
+    }
+
+    // Final fallback: contextual response
+    if (elements.length === 0) {
+      return generateContextualResponse(state, language);
     }
 
     return elements.join(' ');
@@ -736,12 +823,23 @@ class SomaticAgent extends BaseAgent {
 
   contribute(workspace: GlobalWorkspace): string | null {
     const state = workspace.spotlight.dimensional_state;
+    const language = (workspace.spotlight.field_state?.language as SupportedLanguage) || 'en';
+
+    const context: ResponseContext = {
+      language,
+      vertical: state.primary_vertical,
+      domains: state.primary_horizontal,
+      v_mode: state.v_mode_triggered,
+      emergency: state.emergency_detected,
+      arousal: state.integration.phi > 0.7 ? 'high' : 'medium',
+      phi: state.integration.phi,
+    };
 
     if (state.vertical.SOMATIC > 0.5) {
       if (state.emergency_detected) {
-        return 'Right now, just notice your breath.';
+        return generateAgentResponse('SOMATIC', 'emergency', context);
       }
-      return 'What does your body know about this?';
+      return generateAgentResponse('SOMATIC', 'awareness', context);
     }
 
     return null;

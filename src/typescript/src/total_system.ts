@@ -128,7 +128,8 @@ export class TotalSystemOrchestrator {
     const fieldState = this.constructFieldState(
       input.message,
       dimensionalState,
-      memoryContext
+      memoryContext,
+      input.language
     );
 
     // ========================================
@@ -307,7 +308,8 @@ export class TotalSystemOrchestrator {
   private constructFieldState(
     message: string,
     dimensionalState: DimensionalState,
-    memoryContext: ReturnType<typeof memorySystem.getContext>
+    memoryContext: ReturnType<typeof memorySystem.getContext>,
+    language: SupportedLanguage
   ): FieldState {
     // Determine arousal based on phi
     let arousal: Arousal = 'medium';
@@ -365,7 +367,8 @@ export class TotalSystemOrchestrator {
       goal,
       loop_count: 0,
       flags,
-      uncertainty: 1 - dimensionalState.integration.coherence
+      uncertainty: 1 - dimensionalState.integration.coherence,
+      language
     };
   }
 
