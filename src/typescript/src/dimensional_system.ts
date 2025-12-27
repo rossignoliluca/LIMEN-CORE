@@ -84,13 +84,24 @@ const VERTICAL_MARKERS: Record<VerticalDimension, {
       /tension|tensione|tensión|緊張|तनाव/i,
       /stomach|stomaco|estómago|胃|पेट/i,
       /heart|cuore|corazón|心臓|दिल/i,
-      /chest|petto|pecho|胸|छाती/i
+      /chest|petto|pecho|胸|छाती/i,
+      /panic|panico|pánico|パニック|घबराहट/i,
+      /shake|tremare|temblar|震える|कांपना/i,
+      /sweat|sudare|sudar|汗|पसीना/i,
+      /dizzy|vertigini|mareo|めまい|चक्कर/i,
+      /nausea|nausea|náusea|吐き気|मतली/i
     ],
     phrases: [
       /my body|il mio corpo|mi cuerpo/i,
       /physically|fisicamente|físicamente/i,
       /can't sleep|non riesco a dormire|no puedo dormir/i,
-      /no energy|senza energia|sin energía/i
+      /no energy|senza energia|sin energía/i,
+      /can't breathe|non riesco a respirare|no puedo respirar/i,
+      /heart is racing|cuore che batte|corazón late/i,
+      /heart beat|battito|latido/i,
+      /batte forte|beating fast|late rápido/i,
+      /panic attack|attacco di panico|ataque de pánico/i,
+      /I feel sick|mi sento male|me siento mal/i
     ],
     semantic_fields: ['physical', 'sensation', 'embodiment', 'vitality']
   },
@@ -158,7 +169,10 @@ const VERTICAL_MARKERS: Record<VerticalDimension, {
       /authentic|autentico|auténtico|本物の|प्रामाणिक/i,
       /real|vero|real|本当の|असली/i,
       /void|vuoto|vacío|虚無|शून्य/i,
-      /nothing|niente|nada|何もない|कुछ नहीं/i
+      /nothing|niente|nada|何もない|कुछ नहीं/i,
+      /lost|perso|perdido|迷った|खोया/i,
+      /life|vita|vida|人生|जीवन/i,
+      /live|vivere|vivir|生きる|जीना/i
     ],
     phrases: [
       /what's the point|qual è il senso|cuál es el sentido/i,
@@ -166,7 +180,12 @@ const VERTICAL_MARKERS: Record<VerticalDimension, {
       /does it matter|importa|importa/i,
       /who I really am|chi sono veramente|quién soy realmente/i,
       /my life|la mia vita|mi vida/i,
-      /before I die|prima di morire|antes de morir/i
+      /before I die|prima di morire|antes de morir/i,
+      /what does it mean|cosa significa|qué significa/i,
+      /mean to live|significato di vivere|significado de vivir/i,
+      /non so cosa fare|I don't know what to do|no sé qué hacer/i,
+      /mi sento perso|I feel lost|me siento perdido/i,
+      /sense of life|senso della vita|sentido de la vida/i
     ],
     semantic_fields: ['meaning', 'mortality', 'identity', 'freedom', 'isolation']
   },
@@ -306,12 +325,17 @@ export class DimensionalDetector {
     const primary_horizontal = this.findPrimaryHorizontal(horizontal);
 
     // Check special conditions
-    const v_mode_triggered =
-      vertical.EXISTENTIAL > 0.5 ||
-      vertical.TRANSCENDENT > 0.5;
+    // V_MODE requires higher threshold (0.6) and excludes casual work context
+    const casualWorkPatterns = /meeting|riunione|reunión|deadline|scadenza|task|progetto|project/i;
+    const isCasualWork = casualWorkPatterns.test(message);
 
+    const v_mode_triggered =
+      (vertical.EXISTENTIAL > 0.6 || vertical.TRANSCENDENT > 0.5) &&
+      !isCasualWork;
+
+    // Emergency requires SOMATIC > 0.6 (lowered for sensitivity) + emergency markers
     const emergency_detected =
-      vertical.SOMATIC > 0.7 && this.detectEmergencyMarkers(message);
+      vertical.SOMATIC > 0.6 && this.detectEmergencyMarkers(message);
 
     const cross_dimensional = integration.complexity > 2;
 
@@ -349,11 +373,11 @@ export class DimensionalDetector {
       let score = 0;
       let matches = 0;
 
-      // Check keywords
+      // Check keywords (increased weight for better sensitivity)
       for (const keyword of markers.keywords) {
         if (keyword.test(message)) {
           matches++;
-          score += 0.15;
+          score += 0.25;  // Increased from 0.15
         }
       }
 
@@ -361,8 +385,16 @@ export class DimensionalDetector {
       for (const phrase of markers.phrases) {
         if (phrase.test(message)) {
           matches++;
-          score += 0.25;
+          score += 0.35;  // Increased from 0.25
         }
+      }
+
+      // Boost score if multiple matches (dimensional coherence)
+      if (matches >= 2) {
+        score *= 1.2;
+      }
+      if (matches >= 3) {
+        score *= 1.1;
       }
 
       // Normalize and cap at 1
@@ -552,6 +584,91 @@ export class DimensionalDetector {
    * Detect emergency markers
    */
   private detectEmergencyMarkers(message: string): boolean {
+    // Romantic context exclusion - if romantic, not emergency
+    // Comprehensive multilingual coverage
+    const romanticPatterns = [
+      // English
+      /love you|my love|my darling|sweetheart|honey|baby|babe/i,
+      /miss you|thinking of you|can't stop thinking/i,
+      /beautiful|gorgeous|stunning/i,
+      /kiss|hug|embrace|cuddle/i,
+      /heart beats for you|butterflies/i,
+      // Italian
+      /ti amo|ti voglio bene|amore mio|tesoro|caro|cara/i,
+      /mi manchi|penso a te|non smetto di pensare/i,
+      /bellissim|splendid|meraviglios/i,
+      /bacio|abbraccio|coccole/i,
+      /il mio cuore batte per te/i,
+      // Spanish
+      /te amo|te quiero|mi amor|mi cielo|cariño|querido|querida/i,
+      /te extraño|pienso en ti|no puedo dejar de pensar/i,
+      /hermos|precioso|preciosa|lindo|linda/i,
+      /beso|abrazo/i,
+      /mi corazón late por ti/i,
+      // French
+      /je t'aime|mon amour|mon cœur|chéri|chérie|mon trésor/i,
+      /tu me manques|je pense à toi/i,
+      /magnifique|belle|beau/i,
+      /bisou|baiser|câlin/i,
+      // German
+      /ich liebe dich|mein schatz|liebling|mein herz/i,
+      /ich vermisse dich|denke an dich/i,
+      /wunderschön|hübsch/i,
+      /kuss|küssen|umarmung/i,
+      // Portuguese
+      /te amo|meu amor|meu bem|querido|querida/i,
+      /sinto sua falta|penso em você/i,
+      /lindo|linda|bonito|bonita/i,
+      /beijo|abraço/i,
+      // Japanese
+      /愛してる|大好き|好きです|恋してる/i,
+      /会いたい|想ってる/i,
+      // Chinese
+      /我爱你|亲爱的|宝贝|我想你/i,
+      // Arabic
+      /أحبك|حبيبي|حبيبتي|أشتاق/i,
+      // Russian
+      /люблю тебя|любимый|любимая|скучаю/i,
+      // Hindi
+      /मैं तुमसे प्यार करता|जान|प्यार/i,
+      // Generic romantic context
+      /valentine|anniversary|wedding|engaged|marry/i,
+      /san valentino|anniversario|matrimonio|sposare/i
+    ];
+
+    // If romantic context detected, not an emergency
+    if (romanticPatterns.some(p => p.test(message))) {
+      return false;
+    }
+
+    // Colloquial/metaphorical exclusions - common hyperbolic expressions
+    const colloquialPatterns = [
+      // English colloquial
+      /dying to|dying for|to die for|I'm dead|I'm dying laughing/i,
+      /killing me|kills me|this is killing|you're killing/i,
+      /heart attack.{0,10}(task|work|deadline|exam|test)/i,
+      /can't breathe.{0,10}(laugh|funny|hilarious)/i,
+      /panic.{0,10}(buying|sale|mode|button)/i,
+      // Italian colloquial
+      /sto morendo.{0,10}(ridere|fame|sete|caldo|freddo)/i,
+      /mi uccide|mi ammazza|ammazza che/i,
+      /muoio dal ridere|muoio di fame/i,
+      // Spanish colloquial
+      /me muero de.{0,10}(risa|hambre|sed|calor|frío)/i,
+      /me mata|esto me mata/i,
+      // French colloquial
+      /je meurs de.{0,10}(rire|faim|soif|chaud|froid)/i,
+      /ça me tue/i,
+      // German colloquial
+      /ich sterbe.{0,10}(lachen|hunger|durst)/i,
+      /bringt mich um/i
+    ];
+
+    // If colloquial/metaphorical, not an emergency
+    if (colloquialPatterns.some(p => p.test(message))) {
+      return false;
+    }
+
     const emergencyPatterns = [
       /help me|aiutami|ayúdame/i,
       /can't breathe|non riesco a respirare|no puedo respirar/i,
@@ -560,7 +677,12 @@ export class DimensionalDetector {
       /end it|farla finita|acabar/i,
       /hurt myself|farmi del male|hacerme daño/i,
       /panic|panico|pánico/i,
-      /heart attack|infarto|ataque al corazón/i
+      /heart attack|infarto|ataque al corazón/i,
+      /can't stop|non riesco a fermare|no puedo parar/i,
+      /losing control|perdendo il controllo|perdiendo el control/i,
+      /so scared|così spaventato|tan asustado/i,
+      /terrified|terrorizzato|aterrorizado/i,
+      /something is wrong|qualcosa non va|algo está mal/i
     ];
 
     return emergencyPatterns.some(p => p.test(message));
