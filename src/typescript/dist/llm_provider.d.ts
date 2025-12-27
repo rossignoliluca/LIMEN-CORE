@@ -36,10 +36,17 @@ export interface LLMConfig {
     base_url?: string;
 }
 export declare function callLLM(request: LLMRequest, preferredProvider?: LLMProvider): Promise<LLMResponse>;
+/**
+ * Context for LLM generation.
+ *
+ * WHY: Provides all information needed for constrained generation.
+ * HOW: Passed from L2 execution, built from ExecutionContext.
+ * WHERE: Used in generateResponse() to build system/user prompts.
+ */
 export interface GenerationContext {
     primitive: string;
-    atmosphere: string;
-    depth: string;
+    atmosphere: 'OPERATIONAL' | 'HUMAN_FIELD' | 'DECISION' | 'V_MODE' | 'EMERGENCY';
+    depth: 'surface' | 'medium' | 'deep';
     forbidden: string[];
     required: string[];
     language: SupportedLanguage;

@@ -226,6 +226,8 @@ function compileExecutionContext(field, selection, governor, metaKernel) {
         pacing: selection.pacing,
         language: (field.language === 'mixed' || field.language === 'unknown' || !field.language) ? 'auto' : field.language,
         invariants_active: getActiveInvariants(selection.atmosphere),
+        // Pass atmosphere for LLM generation (from Selection, not Field)
+        atmosphere: selection.atmosphere,
     };
     // Resource envelope
     const resources = {
@@ -680,6 +682,13 @@ function executeSurface(context) {
     const templateId = context.output_spec.template_id || context.goal.primitive;
     return getTemplate(templateId, context.constraints.language);
 }
+/**
+ * L2_MEDIUM: Single LLM call for response generation.
+ *
+ * WHY: Medium depth allows LLM generation with constraints.
+ * HOW: Build GenerationContext from ExecutionContext, call LLM.
+ * WHERE: Falls back to template if LLM unavailable or unsupported language.
+ */
 async function executeMedium(context) {
     const llmStatus = (0, llm_provider_1.checkLLMAvailability)();
     const lang = context.constraints.language;
@@ -688,17 +697,19 @@ async function executeMedium(context) {
         return getTemplate(context.goal.primitive, lang);
     }
     try {
-        // For LLM, we need to map to supported LLM languages
-        // Currently LLM provider supports fewer languages - fall back to template for unsupported
-        const llmSupportedLangs = ['en', 'it', 'es', 'fr', 'de', 'pt', 'zh', 'ja', 'ru', 'ar'];
+        // LLM-supported languages (subset of 40 SupportedLanguage)
+        const llmSupportedLangs = [
+            'en', 'it', 'es', 'fr', 'de', 'pt', 'zh', 'ja', 'ru', 'ar', 'hi', 'bn'
+        ];
         const effectiveLang = lang === 'auto' ? 'en' : lang;
         if (!llmSupportedLangs.includes(effectiveLang)) {
             // Use template for languages not yet supported by LLM
             return getTemplate(context.goal.primitive, lang);
         }
+        // Use atmosphere from constraints (passed from Selection layer)
         const generationContext = {
             primitive: context.goal.primitive,
-            atmosphere: context.constraints.invariants_active.includes('V_MODE') ? 'V_MODE' : 'HUMAN_FIELD',
+            atmosphere: context.constraints.atmosphere,
             depth: context.constraints.depth_ceiling,
             forbidden: context.constraints.forbidden,
             required: context.constraints.required,
@@ -712,6 +723,17 @@ async function executeMedium(context) {
         return getTemplate(context.goal.primitive, lang);
     }
 }
+/**
+ * L2_DEEP: Two LLM calls - reasoning then generation.
+ *
+ * WHY: Deep depth requires analysis before response for complex situations.
+ * HOW:
+ *   1. First call: Analyze situation, identify key patterns, plan response
+ *   2. Second call: Generate response informed by analysis
+ * WHERE: Falls back to MEDIUM if first call fails, then to template.
+ *
+ * RUNTIME: ~2000ms, 2 LLM calls
+ */
 async function executeDeep(context) {
     const llmStatus = (0, llm_provider_1.checkLLMAvailability)();
     const lang = context.constraints.language;
@@ -720,26 +742,48 @@ async function executeDeep(context) {
         return getTemplate(context.goal.primitive, lang);
     }
     try {
-        // Determine atmosphere from context
-        let atmosphere = 'HUMAN_FIELD';
-        if (context.constraints.invariants_active.includes('INV-009')) {
-            atmosphere = 'V_MODE';
-        }
-        // For LLM, we need to map to supported LLM languages
-        const llmSupportedLangs = ['en', 'it', 'es', 'fr', 'de', 'pt', 'zh', 'ja', 'ru', 'ar'];
+        // LLM-supported languages
+        const llmSupportedLangs = [
+            'en', 'it', 'es', 'fr', 'de', 'pt', 'zh', 'ja', 'ru', 'ar', 'hi', 'bn'
+        ];
         const effectiveLang = lang === 'auto' ? 'en' : lang;
         if (!llmSupportedLangs.includes(effectiveLang)) {
             // Use template for languages not yet supported by LLM
             return getTemplate(context.goal.primitive, lang);
         }
+        // ====== CALL 1: REASONING ======
+        // Analyze the situation before generating response
+        const reasoningPrompt = buildReasoningPrompt(context);
+        let reasoning;
+        try {
+            const reasoningResponse = await (0, llm_provider_1.callLLM)({
+                system: `You are ENOQ's reasoning layer. Analyze the situation briefly.
+Output a JSON object with:
+- patterns: key patterns you notice (max 3)
+- focus: what the response should focus on
+- avoid: what to avoid based on constraints
+Keep analysis under 100 words.`,
+                messages: [{ role: 'user', content: reasoningPrompt }],
+                max_tokens: 150,
+                temperature: 0.3, // Low temperature for analysis
+            });
+            reasoning = reasoningResponse.content;
+        }
+        catch (reasoningError) {
+            // If reasoning fails, fall back to MEDIUM (single call)
+            return executeMedium(context);
+        }
+        // ====== CALL 2: GENERATION ======
+        // Generate response informed by reasoning
         const generationContext = {
             primitive: context.goal.primitive,
-            atmosphere,
+            atmosphere: context.constraints.atmosphere,
             depth: 'deep',
             forbidden: context.constraints.forbidden,
             required: context.constraints.required,
             language: effectiveLang,
-            user_message: context.goal.intent,
+            // Include reasoning in user_message for informed generation
+            user_message: `${context.goal.intent}\n\nAnalysis context:\n${reasoning}`,
         };
         return await (0, llm_provider_1.generateResponse)(generationContext);
     }
@@ -747,6 +791,18 @@ async function executeDeep(context) {
         // Fallback to template on error
         return getTemplate(context.goal.primitive, lang);
     }
+}
+/**
+ * Build reasoning prompt for first LLM call in DEEP mode.
+ */
+function buildReasoningPrompt(context) {
+    return `Primitive: ${context.goal.primitive}
+Intent: ${context.goal.intent}
+Atmosphere: ${context.constraints.atmosphere}
+Forbidden: ${context.constraints.forbidden.join(', ') || 'none'}
+Required: ${context.constraints.required.join(', ') || 'none'}
+
+Analyze briefly: What patterns are present? What should the response focus on?`;
 }
 // ============================================
 // INVARIANT: L2 BLINDNESS

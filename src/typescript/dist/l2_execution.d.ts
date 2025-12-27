@@ -30,6 +30,13 @@ export interface ExecutionConstraints {
     pacing: Pacing;
     language: SupportedLanguage | 'auto';
     invariants_active: string[];
+    /**
+     * Atmosphere for LLM generation.
+     * WHY: L2 is blind to FieldState but needs atmosphere for prompt construction.
+     * HOW: Passed through from Selection layer (not from Field).
+     * WHERE: Used in executeMedium/executeDeep for GenerationContext.
+     */
+    atmosphere: 'OPERATIONAL' | 'HUMAN_FIELD' | 'DECISION' | 'V_MODE' | 'EMERGENCY';
 }
 export interface ResourceEnvelope {
     max_latency_ms: number;
