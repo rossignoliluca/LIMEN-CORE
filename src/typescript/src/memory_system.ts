@@ -13,9 +13,14 @@
  * Constitutional Constraint: Memory cannot store or retrieve
  * patterns that would lead to dependency formation or
  * constitutional violations.
+ *
+ * Persistence:
+ * - In-memory mode (default): Fast, no disk I/O
+ * - SQLite mode: Persistent across restarts
  */
 
 import { FieldState, HumanDomain, SupportedLanguage } from './types';
+import { MemoryPersistence, PersistenceConfig } from './memory_persistence';
 
 // ============================================
 // TYPES
@@ -516,17 +521,58 @@ export class NeocorticalMemory {
 }
 
 // ============================================
+// MEMORY SYSTEM CONFIGURATION
+// ============================================
+
+export interface MemorySystemConfig {
+  /** Enable SQLite persistence */
+  persistence_enabled: boolean;
+  /** Persistence configuration (only used if persistence_enabled) */
+  persistence_config?: Partial<PersistenceConfig>;
+  /** Max episodes to keep per user */
+  max_episodes_per_user: number;
+  /** Auto-consolidation interval in ms (0 = disabled) */
+  auto_consolidation_interval: number;
+}
+
+export const DEFAULT_MEMORY_CONFIG: MemorySystemConfig = {
+  persistence_enabled: false,
+  max_episodes_per_user: 100,
+  auto_consolidation_interval: 0
+};
+
+// ============================================
 // MEMORY SYSTEM (Unified Interface)
 // ============================================
 
 export class MemorySystem {
   private hippocampus: HippocampalBuffer;
   private neocortex: NeocorticalMemory;
+  private persistence: MemoryPersistence | null = null;
+  private config: MemorySystemConfig;
   private replayInterval: NodeJS.Timeout | null = null;
 
-  constructor() {
+  constructor(config: Partial<MemorySystemConfig> = {}) {
+    this.config = { ...DEFAULT_MEMORY_CONFIG, ...config };
     this.hippocampus = new HippocampalBuffer();
     this.neocortex = new NeocorticalMemory();
+
+    // Initialize persistence if enabled
+    if (this.config.persistence_enabled) {
+      this.persistence = new MemoryPersistence(this.config.persistence_config);
+    }
+
+    // Start auto-consolidation if configured
+    if (this.config.auto_consolidation_interval > 0) {
+      this.startAutoConsolidation(this.config.auto_consolidation_interval);
+    }
+  }
+
+  /**
+   * Check if persistence is enabled
+   */
+  isPersistenceEnabled(): boolean {
+    return this.persistence !== null && this.persistence.isInitialized();
   }
 
   /**
@@ -564,7 +610,15 @@ export class MemorySystem {
       integration_score: 0
     };
 
+    // Store in-memory (hippocampal buffer)
     this.hippocampus.store(episode);
+
+    // Persist to SQLite if enabled
+    if (this.persistence) {
+      this.persistence.storeEpisode(episode);
+      this.persistence.updateLastInteraction(user_id);
+    }
+
     return episode.id;
   }
 
@@ -572,10 +626,16 @@ export class MemorySystem {
    * Update episode outcome (implicit feedback)
    */
   updateOutcome(episode_id: string, user_id: string, outcome: Partial<EpisodeOutcome>): void {
+    // Update in-memory
     const episodes = this.hippocampus.getWorkingMemory(user_id);
     const episode = episodes.find(e => e.id === episode_id);
     if (episode) {
       Object.assign(episode.outcome, outcome);
+    }
+
+    // Persist update
+    if (this.persistence) {
+      this.persistence.updateEpisodeOutcome(episode_id, outcome);
     }
   }
 
@@ -588,9 +648,26 @@ export class MemorySystem {
     effective_strategies: SemanticPattern[];
     autonomy_health: { healthy: boolean; trajectory: number; recommendation: string };
   } {
-    const working_memory = this.hippocampus.getWorkingMemory(user_id);
-    const user_model = this.neocortex.getModel(user_id);
-    const autonomy_health = this.neocortex.checkAutonomyHealth(user_id);
+    // Get working memory (prefer in-memory, fallback to persistence)
+    let working_memory = this.hippocampus.getWorkingMemory(user_id);
+
+    // If in-memory is empty but persistence exists, load from DB
+    if (working_memory.length === 0 && this.persistence) {
+      working_memory = this.persistence.getRecentEpisodes(user_id, 10);
+    }
+
+    // Get user model (prefer in-memory, fallback to persistence)
+    let user_model = this.neocortex.getModel(user_id);
+    let autonomy_health = this.neocortex.checkAutonomyHealth(user_id);
+
+    // If using persistence and model is fresh (no patterns), load from DB
+    if (this.persistence && user_model.semantic_patterns.length === 0) {
+      const persistedModel = this.persistence.getUserModel(user_id);
+      if (persistedModel.semantic_patterns.length > 0) {
+        user_model = persistedModel;
+        autonomy_health = this.persistence.checkAutonomyHealth(user_id);
+      }
+    }
 
     // Get currently active domains from working memory
     const active_domains = new Set<HumanDomain>();
@@ -600,13 +677,22 @@ export class MemorySystem {
       }
     }
 
-    const effective_strategies = this.neocortex.getEffectiveStrategies(
+    // Get effective strategies (prefer in-memory, with persistence fallback)
+    let effective_strategies = this.neocortex.getEffectiveStrategies(
       user_id,
       {
         domains: Array.from(active_domains),
         atmosphere: working_memory[working_memory.length - 1]?.atmosphere || 'HUMAN_FIELD'
       }
     );
+
+    // If no strategies found and persistence exists, try DB
+    if (effective_strategies.length === 0 && this.persistence) {
+      effective_strategies = this.persistence.getEffectivePatterns(
+        user_id,
+        Array.from(active_domains)
+      );
+    }
 
     return {
       working_memory,
@@ -632,6 +718,15 @@ export class MemorySystem {
   consolidate(user_id: string): void {
     const episodes = this.hippocampus.getForReplay(user_id);
     this.neocortex.consolidate(episodes);
+
+    // Persist the updated user model
+    if (this.persistence) {
+      const model = this.neocortex.getModel(user_id);
+      this.persistence.saveUserModel(model);
+
+      // Prune old episodes if needed
+      this.persistence.pruneEpisodes(user_id, this.config.max_episodes_per_user);
+    }
   }
 
   /**
@@ -671,11 +766,91 @@ export class MemorySystem {
 
     return salience;
   }
+
+  /**
+   * Get persistence statistics
+   */
+  getStats(): {
+    persistence_enabled: boolean;
+    episode_count?: number;
+    user_count?: number;
+    pattern_count?: number;
+    db_size_bytes?: number;
+  } {
+    if (!this.persistence) {
+      return { persistence_enabled: false };
+    }
+
+    const stats = this.persistence.getStats();
+    return {
+      persistence_enabled: true,
+      ...stats
+    };
+  }
+
+  /**
+   * Export user data (GDPR compliance)
+   */
+  exportUserData(user_id: string): {
+    episodes: Episode[];
+    model: UserModel;
+    patterns: SemanticPattern[];
+  } | null {
+    if (!this.persistence) {
+      return null;
+    }
+    return this.persistence.exportUserData(user_id);
+  }
+
+  /**
+   * Delete user data (GDPR compliance)
+   */
+  deleteUserData(user_id: string): boolean {
+    if (!this.persistence) {
+      return false;
+    }
+    this.persistence.deleteUserData(user_id);
+    return true;
+  }
+
+  /**
+   * Close persistence connection
+   */
+  close(): void {
+    this.stopAutoConsolidation();
+    if (this.persistence) {
+      this.persistence.close();
+      this.persistence = null;
+    }
+  }
 }
 
 // ============================================
-// SINGLETON EXPORT
+// SINGLETON FACTORY
 // ============================================
 
+let memorySystemInstance: MemorySystem | null = null;
+
+/**
+ * Get or create memory system instance
+ */
+export function getMemorySystem(config?: Partial<MemorySystemConfig>): MemorySystem {
+  if (!memorySystemInstance) {
+    memorySystemInstance = new MemorySystem(config);
+  }
+  return memorySystemInstance;
+}
+
+/**
+ * Reset memory system (for testing)
+ */
+export function resetMemorySystem(): void {
+  if (memorySystemInstance) {
+    memorySystemInstance.close();
+    memorySystemInstance = null;
+  }
+}
+
+// Default singleton (backward compatible, in-memory)
 export const memorySystem = new MemorySystem();
 export default memorySystem;
