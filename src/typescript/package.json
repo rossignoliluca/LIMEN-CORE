@@ -1,13 +1,19 @@
 {
   "name": "enoq-core",
-  "version": "1.0.0",
-  "description": "ENOQ - Constitutional Cognitive Companion",
+  "version": "2.0.0",
+  "description": "ENOQ - Sistema Operativo Totale per l'Esistenza Umana",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "bin": {
+    "enoq": "./dist/enoq_cli.js"
+  },
   "scripts": {
     "build": "tsc",
     "start": "ts-node src/cli.ts",
     "cli": "ts-node src/cli.ts",
+    "enoq": "ts-node src/enoq_cli.ts",
+    "enoq:debug": "ts-node src/enoq_cli.ts --debug --field",
+    "enoq:build": "ts-node src/genesis/self_builder/builder_cli.ts",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
@@ -37,5 +43,8 @@
     "ts-jest": "^29.4.6",
     "ts-node": "^10.9.0",
     "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "openai": "^6.15.0"
   }
 }
