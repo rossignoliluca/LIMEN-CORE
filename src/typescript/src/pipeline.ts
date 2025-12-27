@@ -136,6 +136,10 @@ export interface SessionMemory {
   // Relational
   name?: string;
   language_preference: SupportedLanguage | 'auto';
+
+  // Response tracking to avoid repetition
+  recent_responses: string[];
+  response_history_limit: number;
 }
 
 export interface PipelineResult {
@@ -175,6 +179,8 @@ export function createSession(): Session {
       delegation_attempts: 0,
       decisions_made: 0,
       language_preference: 'auto',
+      recent_responses: [],
+      response_history_limit: 5,
     },
   };
 }

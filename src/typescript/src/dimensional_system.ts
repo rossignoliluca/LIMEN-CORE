@@ -157,6 +157,10 @@ const VERTICAL_MARKERS: Record<VerticalDimension, {
     semantic_fields: ['interpersonal', 'attachment', 'social', 'belonging']
   },
 
+  // EXISTENTIAL dimension triggers V_MODE when score > 0.6
+  // These patterns detect deep meaning-making and identity questions
+  // IMPORTANT: "qual è il punto" and similar must be here, not just "qual è il senso"
+  // Users express existential questioning in many ways
   EXISTENTIAL: {
     keywords: [
       /meaning|significato|significado|意味|अर्थ/i,
@@ -178,9 +182,10 @@ const VERTICAL_MARKERS: Record<VerticalDimension, {
       /live|vivere|vivir|生きる|जीना/i
     ],
     phrases: [
-      /what's the point|qual è il senso|cuál es el sentido/i,
+      // Core existential questions - these TRIGGER V_MODE
+      /what's the point|what is the point|qual è il punto|qual è il senso|cuál es el punto|cuál es el sentido/i,
       /why am I|perché sono|por qué soy/i,
-      /does it matter|importa|importa/i,
+      /does it matter|importa davvero|importa/i,
       /who I really am|chi sono veramente|quién soy realmente/i,
       /my life|la mia vita|mi vida/i,
       /before I die|prima di morire|antes de morir/i,
@@ -188,7 +193,13 @@ const VERTICAL_MARKERS: Record<VerticalDimension, {
       /mean to live|significato di vivere|significado de vivir/i,
       /non so cosa fare|I don't know what to do|no sé qué hacer/i,
       /mi sento perso|I feel lost|me siento perdido/i,
-      /sense of life|senso della vita|sentido de la vida/i
+      /sense of life|senso della vita|sentido de la vida/i,
+      // Additional patterns for common expressions of meaninglessness
+      /ha senso|make sense|tiene sentido|a quoi bon/i,
+      /perché continuo|why do I keep|por qué sigo/i,
+      /cosa sto facendo|what am I doing|qué estoy haciendo/i,
+      /non vedo il senso|I don't see the point|no veo el sentido/i,
+      /a che serve|what's it for|para qué sirve/i
     ],
     semantic_fields: ['meaning', 'mortality', 'identity', 'freedom', 'isolation']
   },

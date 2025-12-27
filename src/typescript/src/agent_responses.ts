@@ -23,6 +23,7 @@ export interface ResponseContext {
   emergency: boolean;
   arousal: 'low' | 'medium' | 'high';
   phi: number;  // integration level
+  recentResponses?: string[];  // avoid repetition
 }
 
 // Partial language map - falls back to English if language not available
@@ -529,10 +530,56 @@ export function generateAgentResponse(
   // Get language-specific or fall back to English
   const langTemplates = subtypeTemplates[lang] || subtypeTemplates.en;
 
-  // Select based on context (phi for variation)
-  const index = Math.floor(context.phi * langTemplates.length) % langTemplates.length;
+  // Select with variation, avoiding recent responses if provided
+  return selectWithVariation(langTemplates, context.phi, context.recentResponses);
+}
 
-  return langTemplates[index];
+/**
+ * Select a response with variation, avoiding recently used responses.
+ *
+ * WHY THIS EXISTS:
+ * Without variation, the same template gets selected every time because:
+ * - phi (integration score) is often 0 or very low
+ * - Array[0] was always selected
+ * - Users experienced repetitive responses within a session
+ *
+ * SOLUTION:
+ * 1. Filter out responses used in recent turns (anti-repetition)
+ * 2. Combine multiple variation sources: timestamp, phi, random
+ * 3. Modulo by available templates for final selection
+ *
+ * FALLBACK:
+ * If all templates have been used, reset and allow any template.
+ * This prevents infinite loops in long sessions.
+ *
+ * @param templates - Array of possible response strings
+ * @param phi - Integration score (0-1), adds some contextual variation
+ * @param recentResponses - Responses used in recent turns, to be avoided
+ * @returns Selected template string
+ */
+function selectWithVariation(
+  templates: string[],
+  phi: number,
+  recentResponses?: string[]
+): string {
+  // Step 1: Filter out recently used responses
+  let availableTemplates = templates;
+  if (recentResponses && recentResponses.length > 0) {
+    const filtered = templates.filter(t => !recentResponses.includes(t));
+    // Only use filtered if we have options left
+    if (filtered.length > 0) {
+      availableTemplates = filtered;
+    }
+    // Otherwise fall back to all templates (reset)
+  }
+
+  // Step 2: Generate variation index from multiple sources
+  const timeVariation = Date.now() % 1000;           // Millisecond variation
+  const phiVariation = Math.floor(phi * 100);        // Context variation
+  const randomVariation = Math.floor(Math.random() * 100);  // True random
+  const combinedVariation = (timeVariation + phiVariation + randomVariation) % availableTemplates.length;
+
+  return availableTemplates[combinedVariation];
 }
 
 /**

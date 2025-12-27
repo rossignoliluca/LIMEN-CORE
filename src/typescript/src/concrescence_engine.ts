@@ -307,6 +307,22 @@ export class ConcrescenceEngine {
     this.currentOccasion.concrescence = concrescence;
 
     // ========================================
+    // PHASE 10.5: TRACK RESPONSE FOR ANTI-REPETITION
+    // ========================================
+    // WHY: Users complained about hearing the same responses within a session.
+    // HOW: Store last N responses in session.memory, passed to template selection.
+    // WHERE: selectWithVariation() in agent_responses.ts filters these out.
+    // LIMIT: Default 5 responses. Older responses are forgotten (shift).
+    const finalResponse = concrescence.satisfaction.response;
+    if (session.memory.recent_responses) {
+      session.memory.recent_responses.push(finalResponse);
+      const limit = session.memory.response_history_limit || 5;
+      while (session.memory.recent_responses.length > limit) {
+        session.memory.recent_responses.shift();
+      }
+    }
+
+    // ========================================
     // PHASE 11: MEMORY UPDATE
     // ========================================
     this.occasionHistory.push(this.currentOccasion);
