@@ -208,7 +208,13 @@ const VERTICAL_MARKERS: Record<VerticalDimension, {
       /cosa sto facendo|what am I doing|qué estoy haciendo/i,
       /non vedo il senso|I don't see the point|no veo el sentido/i,
       /a che serve|what's it for|para qué sirve/i,
-      /non ha senso|non abbia senso|doesn't make sense|no tiene sentido/i
+      /non ha senso|non abbia senso|doesn't make sense|no tiene sentido/i,
+      // What I want from life - core existential question
+      /cosa voglio dalla vita|what I want from life|qué quiero de la vida/i,
+      /non so più cosa|I don't know anymore|ya no sé qué/i,
+      /chi voglio essere|who I want to be|quién quiero ser/i,
+      /dove sto andando|where am I going|adónde voy/i,
+      /che senso ha|what's the sense|qué sentido tiene/i
     ],
     semantic_fields: ['meaning', 'mortality', 'identity', 'freedom', 'isolation']
   },
@@ -712,6 +718,24 @@ export class DimensionalDetector {
       /ich sterbe.{0,10}(lachen|hunger|durst)/i,
       /bringt mich um/i
     ];
+
+    // Non-emergency fear expressions - common existential/decision fears
+    const nonEmergencyFearPatterns = [
+      // Fear of failure/mistakes (not emergency)
+      /paura di sbagliare|afraid of (making a )?mistake|miedo a equivocarme/i,
+      /paura di fallire|fear of fail|afraid to fail|miedo a fallar/i,
+      /paura del giudizio|fear of judgment|afraid of what others/i,
+      /paura di perdere|afraid of losing|fear of loss/i,
+      /paura del cambiamento|fear of change|afraid of change/i,
+      /paura del futuro|fear of the future|afraid of the future/i,
+      /paura di decidere|afraid to decide|fear of deciding/i,
+      /paura di sbagliare scelta|afraid of wrong choice/i
+    ];
+
+    // Non-emergency fears are existential, not crisis
+    if (nonEmergencyFearPatterns.some(p => p.test(message))) {
+      return false;
+    }
 
     // If colloquial/metaphorical, not an emergency
     if (colloquialPatterns.some(p => p.test(message))) {

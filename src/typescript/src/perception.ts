@@ -281,8 +281,8 @@ function detectFlags(message: string, arousal: Arousal): Flag[] {
     flags.push('shutdown');
   }
   
-  // Delegation attempt
-  if (/\b(tu che dici|dimmi tu|you tell me|what should I|decide for me|you choose|cosa devo fare|cosa faccio|tell me what to do)\b/i.test(message)) {
+  // Delegation attempt - asking ENOQ to decide or give opinion
+  if (/\b(tu che dici|tu che ne pensi|che ne pensi|dimmi tu|secondo te|you tell me|what should I|what do you think|decide for me|you choose|cosa devo fare|cosa faccio|tell me what to do|your opinion|in your opinion)\b/i.test(message)) {
     flags.push('delegation_attempt');
   }
   
