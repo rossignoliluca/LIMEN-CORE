@@ -199,11 +199,14 @@ const VERTICAL_MARKERS: Record<VerticalDimension, {
       /mi sento perso|I feel lost|me siento perdido/i,
       /sense of life|senso della vita|sentido de la vida/i,
       // Additional patterns for common expressions of meaninglessness
-      /ha senso|make sense|tiene sentido|a quoi bon/i,
+      /ha senso|abbia senso|avere senso|make sense|tiene sentido|tenga sentido|a quoi bon/i,
+      /nulla ha senso|nulla abbia senso|nothing makes sense|nothing has meaning|nada tiene sentido/i,
+      /senza senso|senseless|meaningless|sin sentido|sans sens/i,
       /perché continuo|why do I keep|por qué sigo/i,
       /cosa sto facendo|what am I doing|qué estoy haciendo/i,
       /non vedo il senso|I don't see the point|no veo el sentido/i,
-      /a che serve|what's it for|para qué sirve/i
+      /a che serve|what's it for|para qué sirve/i,
+      /non ha senso|non abbia senso|doesn't make sense|no tiene sentido/i
     ],
     semantic_fields: ['meaning', 'mortality', 'identity', 'freedom', 'isolation']
   },
