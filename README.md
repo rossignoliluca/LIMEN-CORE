@@ -91,7 +91,7 @@ Fallback ladder: REGENERATE → MEDIUM → SURFACE → PRESENCE
 
 ---
 
-## New Architecture (Dec 2024)
+## New Architecture (Dec 2025)
 
 ### Ultimate Detector
 Contrastive learning + embedding-based detection achieving **100% accuracy**.
