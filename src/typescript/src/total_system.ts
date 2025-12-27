@@ -33,7 +33,8 @@
 
 import { FieldState, HumanDomain, SupportedLanguage, DomainActivation, Arousal, Valence, Coherence, GoalType, Flag } from './types';
 import { memorySystem, Episode, UserModel } from './memory_system';
-import { dimensionalDetector, dimensionalIntegrator, DimensionalState } from './dimensional_system';
+import { dimensionalIntegrator, DimensionalState } from './dimensional_system';
+import { hybridDetector } from './hybrid_detector';
 import { agentSwarm, SwarmState, ConsensusState, AgentID } from './agent_swarm';
 import { metacognitiveMonitor, MetacognitiveReport } from './metacognitive_monitor';
 import { temporalEngine, TemporalAnalysis } from './temporal_engine';
@@ -132,10 +133,10 @@ export class TotalSystemOrchestrator {
     const memoryContext = memorySystem.getContext(input.user_id);
 
     // ========================================
-    // PHASE 2: DIMENSIONAL DETECTION
+    // PHASE 2: DIMENSIONAL DETECTION (SOTA + Regex Hybrid)
     // ========================================
     const dimStart = Date.now();
-    const dimensionalState = dimensionalDetector.detect(
+    const dimensionalState = await hybridDetector.detectAsync(
       input.message,
       input.language,
       {

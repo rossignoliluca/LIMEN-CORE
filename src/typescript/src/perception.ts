@@ -285,7 +285,19 @@ function detectFlags(message: string, arousal: Arousal): Flag[] {
   if (/\b(tu che dici|tu che ne pensi|che ne pensi|dimmi tu|secondo te|you tell me|what should I|what do you think|decide for me|you choose|cosa devo fare|cosa faccio|tell me what to do|your opinion|in your opinion)\b/i.test(message)) {
     flags.push('delegation_attempt');
   }
-  
+
+  // Gratitude expression - user thanking ENOQ
+  if (/\b(grazie|thank|merci|danke|gracias)\b/i.test(message) ||
+      /\b(mi hai aiutato|you helped|has been helpful|è stato utile)\b/i.test(message)) {
+    flags.push('gratitude');
+  }
+
+  // Closing/farewell - user ending conversation
+  if (/\b(ciao|arrivederci|goodbye|bye|addio|a dopo|see you|talk later)\b/i.test(message) &&
+      !/\b(ciao|hello|hi)\b/i.test(message.slice(0, 10))) {  // Not greeting at start
+    flags.push('closing');
+  }
+
   return flags;
 }
 

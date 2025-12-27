@@ -214,7 +214,12 @@ const VERTICAL_MARKERS: Record<VerticalDimension, {
       /non so più cosa|I don't know anymore|ya no sé qué/i,
       /chi voglio essere|who I want to be|quién quiero ser/i,
       /dove sto andando|where am I going|adónde voy/i,
-      /che senso ha|what's the sense|qué sentido tiene/i
+      /che senso ha|what's the sense|qué sentido tiene/i,
+      // Core "what I want" questions (without "from life")
+      /non so cosa voglio|I don't know what I want|no sé lo que quiero/i,
+      /cosa voglio (veramente|davvero)|what I really want|lo que realmente quiero/i,
+      /cosa desidero|what I desire|lo que deseo/i,
+      /non so chi sono|I don't know who I am|no sé quién soy/i
     ],
     semantic_fields: ['meaning', 'mortality', 'identity', 'freedom', 'isolation']
   },
@@ -729,7 +734,13 @@ export class DimensionalDetector {
       /paura del cambiamento|fear of change|afraid of change/i,
       /paura del futuro|fear of the future|afraid of the future/i,
       /paura di decidere|afraid to decide|fear of deciding/i,
-      /paura di sbagliare scelta|afraid of wrong choice/i
+      // Fear of wrong choice (various phrasings)
+      /paura.*(scelta|decisione).*(sbagliata|errata|wrong)/i,
+      /scelta sbagliata|wrong choice|wrong decision/i,
+      /afraid.*(wrong|bad).*(choice|decision)/i,
+      // Fear of not knowing / uncertainty (existential, not panic)
+      /paura di non sapere|afraid of not knowing/i,
+      /paura dell'incertezza|fear of uncertainty/i,
     ];
 
     // Non-emergency fears are existential, not crisis
