@@ -86,10 +86,13 @@ const VERTICAL_MARKERS: Record<VerticalDimension, {
       /heart|cuore|corazón|心臓|दिल/i,
       /chest|petto|pecho|胸|छाती/i,
       /panic|panico|pánico|パニック|घबराहट/i,
-      /shake|tremare|temblar|震える|कांपना/i,
+      /shake|tremare|tremando|temblar|temblando|震える|कांपना/i,
       /sweat|sudare|sudar|汗|पसीना/i,
       /dizzy|vertigini|mareo|めまい|चक्कर/i,
-      /nausea|nausea|náusea|吐き気|मतली/i
+      /nausea|nausea|náusea|吐き気|मतली/i,
+      /suffocate|soffocare|soffoco|asfixia|ahogar/i,
+      /scared|paura|miedo|peur|angst/i,
+      /calm|calmare|calmar|calmer/i
     ],
     phrases: [
       /my body|il mio corpo|mi cuerpo/i,
@@ -333,9 +336,9 @@ export class DimensionalDetector {
       (vertical.EXISTENTIAL > 0.6 || vertical.TRANSCENDENT > 0.5) &&
       !isCasualWork;
 
-    // Emergency requires SOMATIC > 0.6 (lowered for sensitivity) + emergency markers
+    // Emergency requires SOMATIC >= 0.6 + emergency markers
     const emergency_detected =
-      vertical.SOMATIC > 0.6 && this.detectEmergencyMarkers(message);
+      vertical.SOMATIC >= 0.6 && this.detectEmergencyMarkers(message);
 
     const cross_dimensional = integration.complexity > 2;
 
@@ -682,7 +685,16 @@ export class DimensionalDetector {
       /losing control|perdendo il controllo|perdiendo el control/i,
       /so scared|così spaventato|tan asustado/i,
       /terrified|terrorizzato|aterrorizado/i,
-      /something is wrong|qualcosa non va|algo está mal/i
+      /something is wrong|qualcosa non va|algo está mal/i,
+      // Additional panic/anxiety markers
+      /suffocating|soffocare|soffoco|asfixia/i,
+      /trembling|shaking|tremando|temblando/i,
+      /can't calm|non riesco a calmar|no puedo calmar/i,
+      /ho paura|I'm scared|tengo miedo|j'ai peur|ich habe angst/i,
+      /sto male|I feel awful|me siento mal/i,
+      /heart pounding|cuore che batte|corazón late/i,
+      /anxiety attack|attacco d'ansia|ataque de ansiedad/i,
+      /hyperventilating|iperventilando/i
     ];
 
     return emergencyPatterns.some(p => p.test(message));
