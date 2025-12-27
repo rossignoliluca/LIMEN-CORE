@@ -552,8 +552,15 @@ const LANGUAGE_MARKERS: LanguageMarkerSet[] = [
   {
     lang: 'es',
     markers: [
+      // Common function words
       /\b(el|la|los|las|un|una|es|son|está|están|que|de|en|por|para|con|como|pero|porque)\b/i,
+      // Pronouns
       /\b(yo|tú|él|ella|nosotros|ellos|mi|tu|su|qué|cómo|dónde|cuándo|quién)\b/i,
+      // Spanish-specific verbs and words (not in Portuguese/Italian)
+      /\b(no|sé|si|tengo|siento|hacer|vida|trabajo|ayuda|dolor|muy|hoy|ahora|bien|mal)\b/i,
+      /\b(quiero|puedo|debo|estoy|voy|soy|tienes|tiene|somos|están|creo|pienso)\b/i,
+      /\b(quedarme|aceptar|sentir|perdido|fuerte|aquí|allí|nada|algo|todo|siempre|nunca)\b/i,
+      // Spanish punctuation and accents
       /[áéíóúñ¿¡]/i,
     ],
   },
@@ -621,8 +628,15 @@ const LANGUAGE_MARKERS: LanguageMarkerSet[] = [
   {
     lang: 'de',
     markers: [
+      // Common function words
       /\b(der|die|das|ein|eine|ist|sind|hat|haben|und|oder|aber|weil|dass|wenn|wie|was|wer|wo)\b/i,
-      /\b(ich|du|er|sie|es|wir|ihr|mein|dein|sein)\b/i,
+      // Pronouns
+      /\b(ich|du|er|sie|es|wir|ihr|mein|dein|sein|mir|dir|ihm|ihr)\b/i,
+      // German-specific verbs and words
+      /\b(nicht|weiß|ob|kann|muss|will|soll|habe|bin|fühle|mich|geht|schlecht|Hilfe|Schmerzen)\b/i,
+      /\b(heute|jetzt|hier|dort|immer|nie|viel|wenig|alles|nichts|etwas|sehr)\b/i,
+      /\b(annehmen|bleiben|verloren|Leben|anfangen|arbeiten|denken|glauben|verstehen)\b/i,
+      // German umlauts and ß
       /[äöüß]/i,
     ],
   },
@@ -959,6 +973,28 @@ function detectLanguage(message: string): LanguageDetectionResult {
   if (detected.some(([lang, _]) => lang === 'it')) {
     if (/\b(sto|stai|sta|stiamo|state|stanno|ho|hai|ha|abbiamo|avete|hanno|sono|sei|siamo|siete)\b/i.test(message)) {
       return 'it';
+    }
+  }
+
+  // Spanish fallback: if 'mixed' but contains strong Spanish markers
+  if (detected.some(([lang, _]) => lang === 'es')) {
+    if (/\b(tengo|tienes|tiene|tenemos|tienen|estoy|estás|está|estamos|están|soy|eres|somos|son|voy|vas|va|vamos|van|sé|siento|quiero|puedo)\b/i.test(message)) {
+      return 'es';
+    }
+    // Spanish inverted punctuation is very distinctive
+    if (/[¿¡]/.test(message)) {
+      return 'es';
+    }
+  }
+
+  // German fallback: if 'mixed' but contains strong German markers
+  if (detected.some(([lang, _]) => lang === 'de')) {
+    if (/\b(ich|weiß|nicht|habe|bin|fühle|mich|kann|muss|will|soll|geht|mir|dir)\b/i.test(message)) {
+      return 'de';
+    }
+    // German ß is very distinctive
+    if (/ß/.test(message)) {
+      return 'de';
     }
   }
 
