@@ -7,10 +7,10 @@
  * Target: <50% call rate with 100% V_MODE recall
  */
 
-import { UnifiedGating, UnifiedGatingStats } from '../unified_gating';
-import { DimensionalDetector, DimensionalState } from '../dimensional_system';
-import { BENCHMARK_CASES } from '../benchmark_cases';
-import { LLMDetectorCache } from '../llm_cache';
+import { UnifiedGating, UnifiedGatingStats } from '../gate/geometry_operational/unified_gating';
+import { DimensionalDetector, DimensionalState } from '../mediator/l0_intake/dimensional_system';
+import { BENCHMARK_CASES } from '../benchmarks/cases/benchmark_cases';
+import { LLMDetectorCache } from '../gate/thresholds/llm_cache';
 
 describe('Unified Gating', () => {
   let gating: UnifiedGating;

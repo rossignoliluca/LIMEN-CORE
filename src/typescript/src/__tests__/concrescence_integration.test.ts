@@ -15,8 +15,8 @@
  * RUN: npx jest concrescence_integration.test.ts
  */
 
-import { ConcrescenceEngine } from '../concrescence_engine';
-import { createSession } from '../pipeline';
+import { ConcrescenceEngine } from '../mediator/concrescence/concrescence_engine';
+import { createSession } from '../runtimes/enoq/pipeline/pipeline';
 
 describe('ConcrescenceEngine Integration', () => {
   let engine: ConcrescenceEngine;

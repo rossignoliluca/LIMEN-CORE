@@ -12,9 +12,9 @@
  * - Overall accuracy: 54% → 80%+
  */
 
-import { BENCHMARK_CASES, BenchmarkCase } from '../benchmark_cases';
-import { DimensionalDetector, DimensionalState } from '../dimensional_system';
-import { LLMDetectorV2, shouldCallLLM, GatingDecision } from '../llm_detector_v2';
+import { BENCHMARK_CASES, BenchmarkCase } from '../benchmarks/cases/benchmark_cases';
+import { DimensionalDetector, DimensionalState } from '../mediator/l0_intake/dimensional_system';
+import { LLMDetectorV2, shouldCallLLM, GatingDecision } from '../mediator/l0_intake/llm_detector_v2';
 
 // Skip if no LLM test flag
 const RUN_LLM_TESTS = process.env.LLM_TEST === 'true';

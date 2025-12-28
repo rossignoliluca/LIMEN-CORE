@@ -7,9 +7,9 @@
  * 3. AXIS (constitutional validation)
  */
 
-import { DissipationEngine, dissipationEngine, DEFAULT_DISSIPATION_CONFIG } from '../dissipation';
-import { UnpredictableComponent, unpredictableComponent, ethicalCheck } from '../ethics/unpredictable';
-import { Axis, axis, validateResponse, isValid, getCeiling } from '../axis/axis';
+import { DissipationEngine, dissipationEngine, DEFAULT_DISSIPATION_CONFIG } from '../mediator/l2_reflect/dissipation';
+import { UnpredictableComponent, unpredictableComponent, ethicalCheck } from '../mediator/l4_agency/unpredictable';
+import { Axis, axis, validateResponse, isValid, getCeiling } from '../gate/invariants/axis';
 
 // ============================================
 // DISSIPATION ENGINE TESTS

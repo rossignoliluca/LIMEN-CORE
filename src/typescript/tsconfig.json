@@ -11,7 +11,15 @@
     "forceConsistentCasingInFileNames": true,
     "declaration": true,
     "declarationMap": true,
-    "sourceMap": true
+    "sourceMap": true,
+    "baseUrl": "./src",
+    "paths": {
+      "@shared/*": ["shared/*"],
+      "@theory/*": ["theory/*"],
+      "@control/*": ["control/*"],
+      "@runtime/*": ["runtime/*"],
+      "@benchmarks/*": ["benchmarks/*"]
+    }
   },
   "include": ["src/**/*"],
   "exclude": ["node_modules", "dist"]

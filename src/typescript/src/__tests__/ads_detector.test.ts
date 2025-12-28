@@ -16,9 +16,9 @@ import {
   computeADS,
   MOTIVE_PROBLEM_WEIGHTS,
   DELEGATION_MARKERS,
-} from '../ads_detector';
-import { DimensionalState } from '../dimensional_system';
-import { FieldState } from '../types';
+} from '../gate/geometry_normative/ads_detector';
+import { DimensionalState } from '../mediator/l0_intake/dimensional_system';
+import { FieldState } from '../interface/types';
 
 // ============================================
 // TEST FIXTURES

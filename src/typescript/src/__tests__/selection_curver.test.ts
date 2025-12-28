@@ -11,13 +11,13 @@ import {
   getCurvatureSeverity,
   manifoldRequiresCurvature,
   CurvatureResult,
-} from '../selection_curver';
+} from '../mediator/l2_reflect/selection_curver';
 import {
   ManifoldState,
   FieldDiagnostics,
   createInitialState,
-} from '../stochastic_field';
-import { ProtocolSelection, Atmosphere, Depth } from '../types';
+} from '../mediator/l2_reflect/stochastic_field';
+import { ProtocolSelection, Atmosphere, Depth } from '../interface/types';
 
 // ============================================
 // TEST FIXTURES

@@ -15,8 +15,8 @@ import {
   UltimateDetector,
   DetectorOutput,
   SafetyFloor
-} from '../ultimate_detector';
-import { SupportedLanguage } from '../types';
+} from '../mediator/l0_intake/ultimate_detector';
+import { SupportedLanguage } from '../interface/types';
 
 describe('Ultimate Detector v2 (Calibrated Sensor)', () => {
   let detector: UltimateDetector;

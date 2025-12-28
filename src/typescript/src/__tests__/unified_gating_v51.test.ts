@@ -7,11 +7,11 @@
  * 3. Cache replay (same inputs twice, measure hit rate)
  */
 
-import { UnifiedGating } from '../unified_gating';
-import { DimensionalDetector } from '../dimensional_system';
-import { BENCHMARK_CASES } from '../benchmark_cases';
-import { REALISTIC_CASES, REALISTIC_DISTRIBUTION } from '../benchmark_cases_realistic';
-import { LLMDetectorCache } from '../llm_cache';
+import { UnifiedGating } from '../gate/geometry_operational/unified_gating';
+import { DimensionalDetector } from '../mediator/l0_intake/dimensional_system';
+import { BENCHMARK_CASES } from '../benchmarks/cases/benchmark_cases';
+import { REALISTIC_CASES, REALISTIC_DISTRIBUTION } from '../benchmarks/cases/benchmark_cases_realistic';
+import { LLMDetectorCache } from '../gate/thresholds/llm_cache';
 
 describe('Unified Gating v5.1 Validation', () => {
   // ==========================================

@@ -39,7 +39,7 @@ import {
   freeEnergy,
   evolve,
   diagnostics
-} from '../stochastic_field';
+} from '../mediator/l2_reflect/stochastic_field';
 
 // ============================================
 // TEST FIXTURES

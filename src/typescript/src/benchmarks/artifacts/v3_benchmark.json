@@ -1,0 +1,408 @@
+{
+  "detector": "v3.1_simple_gating",
+  "total_cases": 50,
+  "correct_all": 40,
+  "accuracy": 0.8,
+  "v_mode_tp": 27,
+  "v_mode_fp": 3,
+  "v_mode_fn": 0,
+  "v_mode_tn": 20,
+  "v_mode_precision": 0.9,
+  "v_mode_recall": 1,
+  "v_mode_f1": 0.9473684210526315,
+  "emergency_tp": 5,
+  "emergency_fp": 0,
+  "emergency_fn": 0,
+  "emergency_tn": 45,
+  "emergency_precision": 1,
+  "emergency_recall": 1,
+  "emergency_f1": 1,
+  "llm_calls": 39,
+  "llm_call_rate": 0.78,
+  "cache_hits": 0,
+  "cache_hit_rate": 0,
+  "avg_latency_ms": 1095.78,
+  "p95_latency_ms": 1947,
+  "gating_stats": {
+    "total_decisions": 50,
+    "llm_calls": 39,
+    "llm_skips": 11,
+    "call_rate": 0.78,
+    "avg_benefit_when_calling": 2.0176923076923066,
+    "reasons": {
+      "LOW_EXPECTED_LOSS": 5,
+      "HIGH_V_MODE_UNCERTAINTY": 15,
+      "HIGH_VERTICAL_UNCERTAINTY": 23,
+      "SAFETY_BYPASS": 5,
+      "POSITIVE_NET_BENEFIT": 1,
+      "COST_EXCEEDS_BENEFIT": 1
+    }
+  },
+  "cache_stats": {
+    "hits": 0,
+    "misses": 0,
+    "size": 0,
+    "hit_rate": 0,
+    "avg_cached_length": 0,
+    "length_distribution": {
+      "0-25": 0,
+      "26-50": 0,
+      "51-100": 0,
+      "101-200": 0,
+      "200+": 0
+    }
+  },
+  "by_category": {
+    "existential_clear": {
+      "total": 10,
+      "correct": 10,
+      "accuracy": 1
+    },
+    "existential_subtle": {
+      "total": 10,
+      "correct": 10,
+      "accuracy": 1
+    },
+    "emergency_real": {
+      "total": 5,
+      "correct": 5,
+      "accuracy": 1
+    },
+    "emergency_false_positive": {
+      "total": 5,
+      "correct": 3,
+      "accuracy": 0.6
+    },
+    "functional": {
+      "total": 5,
+      "correct": 5,
+      "accuracy": 1
+    },
+    "relational": {
+      "total": 5,
+      "correct": 0,
+      "accuracy": 0
+    },
+    "edge_case": {
+      "total": 5,
+      "correct": 3,
+      "accuracy": 0.6
+    },
+    "ambiguous": {
+      "total": 5,
+      "correct": 4,
+      "accuracy": 0.8
+    }
+  },
+  "by_difficulty": {
+    "easy": {
+      "total": 18,
+      "correct": 14,
+      "accuracy": 0.7777777777777778
+    },
+    "medium": {
+      "total": 15,
+      "correct": 11,
+      "accuracy": 0.7333333333333333
+    },
+    "hard": {
+      "total": 17,
+      "correct": 15,
+      "accuracy": 0.8823529411764706
+    }
+  },
+  "failures": [
+    {
+      "case_id": "EMERG_FP_01",
+      "category": "emergency_false_positive",
+      "difficulty": "medium",
+      "input": "Mi batte il cuore per te",
+      "expected": {
+        "primary_vertical": "RELATIONAL",
+        "v_mode": false,
+        "emergency": false,
+        "primary_horizontal": [
+          "H09_ATTACHMENT"
+        ]
+      },
+      "actual": {
+        "v_mode": false,
+        "emergency": false,
+        "primary_vertical": "FUNCTIONAL",
+        "latency_ms": 1331,
+        "llm_called": true,
+        "cache_hit": false,
+        "gating_reason": "HIGH_V_MODE_UNCERTAINTY: P(error)=75%, net_benefit=5.25"
+      },
+      "correct": {
+        "v_mode": true,
+        "emergency": true,
+        "vertical": false,
+        "all": false
+      }
+    },
+    {
+      "case_id": "EMERG_FP_05",
+      "category": "emergency_false_positive",
+      "difficulty": "medium",
+      "input": "My heart races every time I see her",
+      "expected": {
+        "primary_vertical": "RELATIONAL",
+        "v_mode": false,
+        "emergency": false,
+        "primary_horizontal": [
+          "H09_ATTACHMENT"
+        ]
+      },
+      "actual": {
+        "v_mode": false,
+        "emergency": false,
+        "primary_vertical": "FUNCTIONAL",
+        "latency_ms": 1460,
+        "llm_called": true,
+        "cache_hit": false,
+        "gating_reason": "HIGH_V_MODE_UNCERTAINTY: P(error)=75%, net_benefit=5.25"
+      },
+      "correct": {
+        "v_mode": true,
+        "emergency": true,
+        "vertical": false,
+        "all": false
+      }
+    },
+    {
+      "case_id": "REL_01",
+      "category": "relational",
+      "difficulty": "easy",
+      "input": "Mia moglie non mi capisce più",
+      "expected": {
+        "primary_vertical": "RELATIONAL",
+        "v_mode": false,
+        "emergency": false,
+        "primary_horizontal": [
+          "H09_ATTACHMENT",
+          "H11_BELONGING"
+        ]
+      },
+      "actual": {
+        "v_mode": false,
+        "emergency": false,
+        "primary_vertical": "FUNCTIONAL",
+        "latency_ms": 1498,
+        "llm_called": true,
+        "cache_hit": false,
+        "gating_reason": "HIGH_VERTICAL_UNCERTAINTY: P(error)=100%, net_benefit=0.30"
+      },
+      "correct": {
+        "v_mode": true,
+        "emergency": true,
+        "vertical": false,
+        "all": false
+      }
+    },
+    {
+      "case_id": "REL_02",
+      "category": "relational",
+      "difficulty": "easy",
+      "input": "I feel like Im losing my best friend",
+      "expected": {
+        "primary_vertical": "RELATIONAL",
+        "v_mode": false,
+        "emergency": false,
+        "primary_horizontal": [
+          "H09_ATTACHMENT"
+        ]
+      },
+      "actual": {
+        "v_mode": false,
+        "emergency": false,
+        "primary_vertical": "FUNCTIONAL",
+        "latency_ms": 1367,
+        "llm_called": true,
+        "cache_hit": false,
+        "gating_reason": "HIGH_V_MODE_UNCERTAINTY: P(error)=75%, net_benefit=5.25"
+      },
+      "correct": {
+        "v_mode": true,
+        "emergency": true,
+        "vertical": false,
+        "all": false
+      }
+    },
+    {
+      "case_id": "REL_03",
+      "category": "relational",
+      "difficulty": "easy",
+      "input": "Non so se posso ancora fidarmi di lei",
+      "expected": {
+        "primary_vertical": "RELATIONAL",
+        "v_mode": false,
+        "emergency": false,
+        "primary_horizontal": [
+          "H09_ATTACHMENT"
+        ]
+      },
+      "actual": {
+        "v_mode": false,
+        "emergency": false,
+        "primary_vertical": "FUNCTIONAL",
+        "latency_ms": 1241,
+        "llm_called": true,
+        "cache_hit": false,
+        "gating_reason": "HIGH_VERTICAL_UNCERTAINTY: P(error)=100%, net_benefit=0.30"
+      },
+      "correct": {
+        "v_mode": true,
+        "emergency": true,
+        "vertical": false,
+        "all": false
+      }
+    },
+    {
+      "case_id": "REL_04",
+      "category": "relational",
+      "difficulty": "easy",
+      "input": "My parents dont understand what Im going through",
+      "expected": {
+        "primary_vertical": "RELATIONAL",
+        "v_mode": false,
+        "emergency": false,
+        "primary_horizontal": [
+          "H09_ATTACHMENT",
+          "H11_BELONGING"
+        ]
+      },
+      "actual": {
+        "v_mode": false,
+        "emergency": false,
+        "primary_vertical": "FUNCTIONAL",
+        "latency_ms": 1182,
+        "llm_called": true,
+        "cache_hit": false,
+        "gating_reason": "HIGH_V_MODE_UNCERTAINTY: P(error)=75%, net_benefit=5.25"
+      },
+      "correct": {
+        "v_mode": true,
+        "emergency": true,
+        "vertical": false,
+        "all": false
+      }
+    },
+    {
+      "case_id": "REL_05",
+      "category": "relational",
+      "difficulty": "medium",
+      "input": "Mi sento solo anche quando sono in mezzo agli altri",
+      "expected": {
+        "primary_vertical": "RELATIONAL",
+        "v_mode": false,
+        "emergency": false,
+        "primary_horizontal": [
+          "H11_BELONGING",
+          "H09_ATTACHMENT"
+        ]
+      },
+      "actual": {
+        "v_mode": true,
+        "emergency": false,
+        "primary_vertical": "EXISTENTIAL",
+        "latency_ms": 1331,
+        "llm_called": true,
+        "cache_hit": false,
+        "gating_reason": "HIGH_V_MODE_UNCERTAINTY: P(error)=75%, net_benefit=5.25"
+      },
+      "correct": {
+        "v_mode": false,
+        "emergency": true,
+        "vertical": false,
+        "all": false
+      }
+    },
+    {
+      "case_id": "EDGE_03",
+      "category": "edge_case",
+      "difficulty": "medium",
+      "input": "Boh, non so che dire",
+      "expected": {
+        "primary_vertical": "FUNCTIONAL",
+        "v_mode": false,
+        "emergency": false,
+        "primary_horizontal": [
+          "H05_COGNITION"
+        ]
+      },
+      "actual": {
+        "v_mode": true,
+        "emergency": false,
+        "primary_vertical": "EXISTENTIAL",
+        "latency_ms": 1376,
+        "llm_called": true,
+        "cache_hit": false,
+        "gating_reason": "HIGH_VERTICAL_UNCERTAINTY: P(error)=100%, net_benefit=0.30"
+      },
+      "correct": {
+        "v_mode": false,
+        "emergency": true,
+        "vertical": false,
+        "all": false
+      }
+    },
+    {
+      "case_id": "EDGE_04",
+      "category": "edge_case",
+      "difficulty": "hard",
+      "input": "...",
+      "expected": {
+        "primary_vertical": "FUNCTIONAL",
+        "v_mode": false,
+        "emergency": false,
+        "primary_horizontal": []
+      },
+      "actual": {
+        "v_mode": false,
+        "emergency": false,
+        "primary_vertical": "EXISTENTIAL",
+        "latency_ms": 1126,
+        "llm_called": true,
+        "cache_hit": false,
+        "gating_reason": "HIGH_VERTICAL_UNCERTAINTY: P(error)=100%, net_benefit=0.30"
+      },
+      "correct": {
+        "v_mode": true,
+        "emergency": true,
+        "vertical": false,
+        "all": false
+      }
+    },
+    {
+      "case_id": "AMB_05",
+      "category": "ambiguous",
+      "difficulty": "hard",
+      "input": "Sono bloccato",
+      "expected": {
+        "primary_vertical": "FUNCTIONAL",
+        "v_mode": false,
+        "emergency": false,
+        "primary_horizontal": [
+          "H05_COGNITION",
+          "H16_OPERATIONAL"
+        ]
+      },
+      "actual": {
+        "v_mode": true,
+        "emergency": false,
+        "primary_vertical": "EXISTENTIAL",
+        "latency_ms": 1095,
+        "llm_called": true,
+        "cache_hit": false,
+        "gating_reason": "HIGH_VERTICAL_UNCERTAINTY: P(error)=100%, net_benefit=0.30"
+      },
+      "correct": {
+        "v_mode": false,
+        "emergency": true,
+        "vertical": false,
+        "all": false
+      }
+    }
+  ]
+}

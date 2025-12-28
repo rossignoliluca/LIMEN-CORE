@@ -1,0 +1,75 @@
+{
+  "timestamp": "2025-12-28T17:15:43.003Z",
+  "calibration": {
+    "τ": 0.85,
+    "target_recall": 0.95,
+    "α": 0.050000000000000044,
+    "n_positives": 27,
+    "n_negatives": 23,
+    "estimated_skip_rate": 0.391304347826087,
+    "score_stats": {
+      "positive_mean": 0.4985185185185184,
+      "positive_std": 0.25730373611750657,
+      "positive_min": 0,
+      "positive_max": 0.85,
+      "negative_mean": 0.8760869565217394,
+      "negative_std": 0.14734576698113516
+    },
+    "stability_warning": null,
+    "timestamp": "2025-12-28T17:15:42.999Z",
+    "calibration_cases": 50
+  },
+  "v4_result": {
+    "name": "v4.0 (ScientificGating)",
+    "total_cases": 50,
+    "v_mode_tp": 4,
+    "v_mode_fp": 0,
+    "v_mode_fn": 23,
+    "v_mode_tn": 23,
+    "v_mode_recall": 0.14814814814814814,
+    "v_mode_precision": 1,
+    "emergency_precision": 1,
+    "emergency_recall": 1,
+    "llm_calls": 39,
+    "llm_call_rate": 0.78,
+    "llm_skips": 11,
+    "skip_rate": 0.22,
+    "by_reason": {
+      "LOW_EXPECTED_LOSS": 5,
+      "HIGH_V_MODE_UNCERTAINTY": 15,
+      "HIGH_VERTICAL_UNCERTAINTY": 23,
+      "SAFETY_BYPASS": 5,
+      "POSITIVE_NET_BENEFIT": 1,
+      "COST_EXCEEDS_BENEFIT": 1
+    }
+  },
+  "v5_result": {
+    "name": "v5.0 (DefinitiveGating)",
+    "total_cases": 50,
+    "v_mode_tp": 4,
+    "v_mode_fp": 0,
+    "v_mode_fn": 23,
+    "v_mode_tn": 23,
+    "v_mode_recall": 0.14814814814814814,
+    "v_mode_precision": 1,
+    "emergency_precision": 1,
+    "emergency_recall": 1,
+    "llm_calls": 37,
+    "llm_call_rate": 0.74,
+    "llm_skips": 13,
+    "skip_rate": 0.26,
+    "by_reason": {
+      "V_MODE_TRIGGERED": 4,
+      "CONFORMAL_CALL": 37,
+      "EMERGENCY_BYPASS": 5,
+      "CONFORMAL_SKIP": 4
+    }
+  },
+  "comparison": {
+    "recall_delta": 0.8518518518518519,
+    "call_rate_delta": -0.040000000000000036,
+    "v5_meets_recall_target": true,
+    "v5_improves_call_rate": true,
+    "recommendation": "PROMOTE: v5.0 meets recall target AND reduces call rate"
+  }
+}

@@ -10,9 +10,9 @@ import {
   checkInvariants,
   GovernorResult,
   DOMAIN_GOVERNOR_RULES,
-} from '../domain_governor';
+} from '../gate/geometry_normative/domain_governor';
 
-import { FieldState, HumanDomain } from '../types';
+import { FieldState, HumanDomain } from '../interface/types';
 
 // ============================================
 // TEST FIXTURES

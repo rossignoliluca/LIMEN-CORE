@@ -21,9 +21,9 @@ import {
   PatternMatch,
   getPatternsByCategory,
   getPatternResponse
-} from '../disciplines_synthesis';
-import { DimensionalState } from '../dimensional_system';
-import { FieldState, SupportedLanguage } from '../types';
+} from '../mediator/l3_integrate/disciplines_synthesis';
+import { DimensionalState } from '../mediator/l0_intake/dimensional_system';
+import { FieldState, SupportedLanguage } from '../interface/types';
 
 // ============================================
 // TEST HELPERS

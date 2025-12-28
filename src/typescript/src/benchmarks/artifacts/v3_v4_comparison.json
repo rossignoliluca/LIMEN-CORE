@@ -1,0 +1,33 @@
+{
+  "timestamp": "2025-12-28T14:11:44.690Z",
+  "summary": {
+    "accuracy_improvement": 0,
+    "llm_call_reduction": 0,
+    "latency_improvement": -71.46000000000004,
+    "v_mode_recall_delta": 0,
+    "emergency_precision_maintained": true
+  },
+  "v3": {
+    "accuracy": 0.8,
+    "v_mode_recall": 1,
+    "emergency_precision": 1,
+    "llm_call_rate": 0.78,
+    "avg_latency_ms": 1095.78
+  },
+  "v4": {
+    "accuracy": 0.8,
+    "v_mode_recall": 1,
+    "emergency_precision": 1,
+    "llm_call_rate": 0.78,
+    "cache_hit_rate": 0,
+    "avg_latency_ms": 1167.24
+  },
+  "gating_distribution": {
+    "LOW_EXPECTED_LOSS": 5,
+    "HIGH_V_MODE_UNCERTAINTY": 15,
+    "HIGH_VERTICAL_UNCERTAINTY": 23,
+    "SAFETY_BYPASS": 5,
+    "POSITIVE_NET_BENEFIT": 1,
+    "COST_EXCEEDS_BENEFIT": 1
+  }
+}

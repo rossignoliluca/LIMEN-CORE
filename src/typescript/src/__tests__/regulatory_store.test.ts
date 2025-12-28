@@ -15,7 +15,7 @@ import {
   RegulatoryState,
   createDefaultState,
   resetRegulatoryStore
-} from '../regulatory_store';
+} from '../gate/withdrawal/regulatory_store';
 
 // Test directory
 const TEST_DB_DIR = path.join(__dirname, '../../test-data');
@@ -37,7 +37,7 @@ function cleanup(): void {
 
 // ============================================
 // CONSTITUTIONAL LAW TESTS
-// These tests verify ENOQ's core invariants
+// These tests verify LIMEN's core invariants
 // ============================================
 
 describe('Constitutional Laws', () => {

@@ -22,14 +22,14 @@ import {
   checkRulepackToolSafety,
   PlanVerification,
   FallbackContext,
-} from '../plan_act_verifier';
+} from '../gate/verification/plan_act_verifier';
 import {
   ResponsePlan,
   createDefaultPlan,
   createEmergencyPlan,
   createVModePlan,
-} from '../response_plan';
-import { EarlySignals } from '../early_signals';
+} from '../mediator/l5_transform/response_plan';
+import { EarlySignals } from '../mediator/l0_intake/early_signals';
 
 // ============================================
 // HELPER: Create test plans

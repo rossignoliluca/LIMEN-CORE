@@ -1,0 +1,19 @@
+{
+  "τ": 0.85,
+  "target_recall": 0.95,
+  "α": 0.050000000000000044,
+  "n_positives": 27,
+  "n_negatives": 23,
+  "estimated_skip_rate": 0.391304347826087,
+  "score_stats": {
+    "positive_mean": 0.4985185185185184,
+    "positive_std": 0.25730373611750657,
+    "positive_min": 0,
+    "positive_max": 0.85,
+    "negative_mean": 0.8760869565217394,
+    "negative_std": 0.14734576698113516
+  },
+  "stability_warning": null,
+  "timestamp": "2025-12-28T17:15:42.999Z",
+  "calibration_cases": 50
+}

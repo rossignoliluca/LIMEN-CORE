@@ -15,7 +15,7 @@ import {
   interpretEmbeddedGateSignal,
   GateSignal,
   EmbeddedGateResult,
-} from '../gate_embedded';
+} from '../mediator/l0_intake/gate_embedded';
 
 describe('EmbeddedGate Classification', () => {
   beforeEach(() => {

@@ -1,0 +1,98 @@
+{
+  "timestamp": "2025-12-28T16:40:57.988Z",
+  "total_cases": 50,
+  "modules": [
+    {
+      "module": "ConformalCalibrator",
+      "metrics": {
+        "empirical_coverage": 0.72,
+        "target_coverage": 0.9,
+        "calibration_samples": 25
+      },
+      "passed": false,
+      "notes": [
+        "Calibration samples: 25",
+        "Empirical coverage: 72.0%"
+      ]
+    },
+    {
+      "module": "SemanticCache",
+      "metrics": {
+        "cache_size": 50,
+        "exact_hits": 0,
+        "semantic_hits": 0,
+        "miss_rate": 0
+      },
+      "passed": true,
+      "notes": [
+        "Cache size: 50",
+        "Note: Semantic matching requires embedding model"
+      ]
+    },
+    {
+      "module": "SPRTAccumulator",
+      "metrics": {
+        "decision_accuracy": 1,
+        "avg_turns_to_decision": 4,
+        "active_sessions": 2
+      },
+      "passed": true,
+      "notes": [
+        "Decisions made: 7",
+        "Avg turns to decision: 4.0"
+      ]
+    },
+    {
+      "module": "ThompsonSampler",
+      "metrics": {
+        "best_threshold": 0.3,
+        "error_from_optimal": 0.25000000000000006,
+        "total_pulls": 100
+      },
+      "passed": false,
+      "notes": [
+        "Best threshold found: 0.30",
+        "True optimal: 0.55",
+        "Error: 0.250"
+      ]
+    },
+    {
+      "module": "WorldModel",
+      "metrics": {
+        "prediction_accuracy": 0.6122448979591837,
+        "total_predictions": 49,
+        "baseline_accuracy": 0.2
+      },
+      "passed": true,
+      "notes": [
+        "Prediction accuracy: 61.2%",
+        "Note: Random baseline would be ~20%"
+      ]
+    },
+    {
+      "module": "SelfImprover",
+      "metrics": {
+        "corrections_recorded": 23,
+        "variants_generated": 114,
+        "training_examples": 137,
+        "cycles_run": 14
+      },
+      "passed": true,
+      "notes": [
+        "Corrections recorded: 23",
+        "Variants generated: 114",
+        "Training examples: 137"
+      ]
+    }
+  ],
+  "summary": {
+    "passed": 4,
+    "failed": 2,
+    "ready_for_promotion": [
+      "SemanticCache",
+      "SPRTAccumulator",
+      "WorldModel",
+      "SelfImprover"
+    ]
+  }
+}

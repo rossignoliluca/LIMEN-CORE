@@ -13,13 +13,13 @@ import {
   createSession,
   Session,
   PipelineConfig
-} from '../pipeline';
+} from '../runtimes/enoq/pipeline/pipeline';
 import {
   getRegulatoryStore,
   resetRegulatoryStore,
   RegulatoryState,
   createDefaultState
-} from '../regulatory_store';
+} from '../gate/withdrawal/regulatory_store';
 
 // Test config - disable gate for faster tests
 const TEST_CONFIG: PipelineConfig = {

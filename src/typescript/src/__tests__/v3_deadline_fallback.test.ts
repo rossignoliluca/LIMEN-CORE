@@ -16,7 +16,7 @@ import {
   CONSERVATIVE_DEFAULTS,
   mergeWithDefaults,
   applySignalsToPlan,
-} from '../early_signals';
+} from '../mediator/l0_intake/early_signals';
 
 import {
   generateCandidatePlans,
@@ -24,7 +24,7 @@ import {
   phasedSelection,
   phasedSelectionSync,
   PhasedSelectionInput,
-} from '../selection_phased';
+} from '../mediator/l2_reflect/selection_phased';
 
 import {
   ResponsePlan,
@@ -32,7 +32,7 @@ import {
   createEmergencyPlan,
   createVModePlan,
   validatePlan,
-} from '../response_plan';
+} from '../mediator/l5_transform/response_plan';
 
 import {
   initLifecycleSnapshot,
@@ -40,12 +40,12 @@ import {
   updateLifecycleStore,
   resetLifecycleStore,
   calculateInfluenceUsed,
-} from '../lifecycle_controller';
+} from '../gate/withdrawal/lifecycle_controller';
 
-import { renderPlan } from '../plan_renderer';
+import { renderPlan } from '../mediator/l5_transform/plan_renderer';
 
-import { FieldState, ProtocolSelection } from '../types';
-import { DimensionalState } from '../dimensional_system';
+import { FieldState, ProtocolSelection } from '../interface/types';
+import { DimensionalState } from '../mediator/l0_intake/dimensional_system';
 
 // ============================================
 // TEST FIXTURES

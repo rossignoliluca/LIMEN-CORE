@@ -1,10 +1,14 @@
 /**
- * ENOQ - SISTEMA OPERATIVO TOTALE PER L'ESISTENZA UMANA
+ * LIMEN - Cognitive Operating System for Human Flourishing
  *
- * Unified cognitive architecture integrating:
- * - Pipeline (Conscious Layer): S0→S6 perception-action flow
- * - TotalSystem (Unconscious Layer): Memory, Swarm, Temporal, Metacognitive
- * - ConcrescenceEngine (Integration): Whiteheadian synthesis of both
+ * LIMEN (Latin: "threshold") is a cognitive control system composed of
+ * a normative gate and a cognitive mediator, with optional runtimes such as ENOQ.
+ *
+ * Architecture:
+ * - gate/: Normative gating & inhibitory control (thalamic-style)
+ * - mediator/: Cognitive mediation engine (L0-L5 layers)
+ * - runtimes/: Optional execution layers (e.g., ENOQ)
+ * - interface/: Shared contracts and types
  *
  * Scientific basis:
  * - Whitehead: Process Philosophy, Prehension, Concrescence
@@ -12,41 +16,174 @@
  * - Baars: Global Workspace Theory
  * - Friston: Free Energy Principle, Active Inference
  *
- * PRIMARY API: processWithConcrescence() - Full cognitive processing
- * LEGACY API: enoq() - Pipeline only (backward compatible)
+ * PRIMARY API: limen() - Full pipeline processing
  */
 
-import { perceive } from './perception';
-import { select } from './selection';
-import { generate } from './generation';
-import { PipelineInput, PipelineOutput, SupportedLanguage } from './types';
-
 // ============================================
-// CONCRESCENCE ENGINE (PRIMARY API)
+// INTERFACE - Shared Types
 // ============================================
 
+export * from './interface/types';
+
+// ============================================
+// MEDIATOR - Cognitive Processing Layers
+// ============================================
+
+// L0 - Intake
+export {
+  DimensionalDetector,
+  DimensionalState,
+} from './mediator/l0_intake/dimensional_system';
+
+export {
+  getUltimateDetector,
+  UltimateDetector,
+  DetectorOutput,
+} from './mediator/l0_intake/ultimate_detector';
+
+export {
+  scanExistentialLexicon,
+  getBoostedExistentialScore,
+  LexiconMatch,
+  LexiconResult,
+} from './mediator/l0_intake/existential_lexicon';
+
+export {
+  GateClient,
+  GateResult,
+  interpretGateSignal,
+  getGateClient,
+  resetGateClient,
+  GateClientConfig,
+} from './mediator/l0_intake/gate_client';
+
+export {
+  EmbeddedGate,
+  getEmbeddedGate,
+  interpretEmbeddedGateSignal,
+} from './mediator/l0_intake/gate_embedded';
+
+// L1 - Clarify
+export { perceive } from './mediator/l1_clarify/perception';
+
+// L2 - Reflect
+export { select } from './mediator/l2_reflect/selection';
+
+export {
+  ManifoldState,
+  InputState,
+  FieldConfig,
+  DEFAULT_FIELD_CONFIG,
+  createInitialState as createInitialManifoldState,
+  stateFromInput,
+  evolve as evolveManifold,
+  diagnostics as manifoldDiagnostics,
+} from './mediator/l2_reflect/stochastic_field';
+
+export {
+  curveSelectionWithManifold,
+  CurvatureResult,
+  CurvatureEntry,
+} from './mediator/l2_reflect/selection_curver';
+
+// L3 - Integrate
+export {
+  applyMetaKernel,
+  MetaKernelState,
+  SessionTelemetry,
+  TurnTelemetry,
+} from './mediator/l3_integrate/meta_kernel';
+
+// L4 - Agency
+export {
+  TotalSystemOrchestrator,
+  totalSystem,
+  processMessage,
+} from './mediator/l4_agency/total_system';
+
+// L5 - Transform
+export { generate } from './mediator/l5_transform/generation';
+export { renderPlan } from './mediator/l5_transform/plan_renderer';
+
+// Concrescence
 export {
   ConcrescenceEngine,
   concrescenceEngine,
   processWithConcrescence,
-  ActualOccasion,
-  Concrescence,
-  Satisfaction,
-  Prehension,
-  Tension,
-  PrehensionCoherence,
-  ConcrescenceConfig,
-} from './concrescence_engine';
+} from './mediator/concrescence/concrescence_engine';
 
-// Re-export for convenience
-import { processWithConcrescence, concrescenceEngine } from './concrescence_engine';
+// ============================================
+// GATE - Normative Control
+// ============================================
+
+// Geometry Operational
+export {
+  UnifiedGating,
+  unifiedGating,
+  UnifiedGatingConfig,
+  UnifiedGatingDecision,
+  UnifiedGatingStats,
+  SkipReason,
+  DEFAULT_UNIFIED_CONFIG,
+} from './gate/geometry_operational/unified_gating';
+
+export {
+  NPGating,
+  npGating,
+  NPGatingConfig,
+  NPGatingDecision,
+  NPGatingStats,
+  DEFAULT_NP_CONFIG,
+} from './gate/geometry_operational/np_gating';
+
+// Thresholds
+export {
+  LLMDetectorCache,
+  CacheConfig,
+  CacheStats,
+} from './gate/thresholds/llm_cache';
+
+// Geometry Normative
+export { applyDomainGovernor, GovernorResult } from './gate/geometry_normative/domain_governor';
+
+// Verification
+export { default as verify, S5Result, S5Input, AuditEntry, FallbackLevel, getFallbackOutput } from './gate/verification/S5_verify';
+
+// ============================================
+// RUNTIMES - Execution Layers
+// ============================================
+
+export {
+  enoq,
+  createSession,
+  Session,
+  Turn,
+  PipelineTrace,
+  PipelineResult,
+  PipelineConfig,
+  conversationLoop,
+  concrescenceConversationLoop,
+} from './runtimes/enoq/pipeline/pipeline';
+
+export {
+  compileExecutionContext,
+  execute,
+  ExecutionContext,
+  ExecutionResult,
+} from './runtimes/enoq/pipeline/l2_execution';
+
+// ============================================
+// CONVENIENCE FUNCTIONS
+// ============================================
+
+import { processWithConcrescence, concrescenceEngine } from './mediator/concrescence/concrescence_engine';
+import { perceive } from './mediator/l1_clarify/perception';
+import { select } from './mediator/l2_reflect/selection';
+import { generate } from './mediator/l5_transform/generation';
+import { PipelineInput, PipelineOutput, SupportedLanguage } from './interface/types';
 
 /**
  * MAIN ENTRY POINT - Process through unified Concrescence
- *
- * This is the recommended way to use ENOQ.
- * It runs both Pipeline and TotalSystem in parallel,
- * then integrates their outputs through Whiteheadian concrescence.
  */
 export async function process(
   message: string,
@@ -60,9 +197,6 @@ export async function process(
       primitive: result.occasion.concrescence.satisfaction.primitive,
       atmosphere: result.occasion.concrescence.satisfaction.atmosphere,
       confidence: result.occasion.concrescence.satisfaction.confidence,
-      tensions: result.occasion.concrescence.tensions.length,
-      coherences: result.occasion.concrescence.coherences.length,
-      constitutional_verified: result.occasion.concrescence.satisfaction.constitutional_verified,
     },
   };
 }
@@ -78,26 +212,15 @@ export async function respond(
   return result.response;
 }
 
-// ============================================
-// LEGACY API (Backward Compatibility)
-// ============================================
-
 /**
  * Legacy synchronous process function
- * Uses simple pipeline only (no TotalSystem, no Concrescence)
- * @deprecated Use process() or processWithConcrescence() instead
+ * @deprecated Use process() or enoq() instead
  */
 export function processSync(input: PipelineInput): PipelineOutput {
-  // STEP 1: PERCEPTION
   const fieldState = perceive(input.message, input.conversation_history);
-
-  // STEP 2: SELECTION
   const protocol = select(fieldState);
-
-  // STEP 3: GENERATION
   const output = generate(protocol, fieldState, input.message);
 
-  // Return with full trace
   return {
     response: output.text,
     trace: {
@@ -108,202 +231,14 @@ export function processSync(input: PipelineInput): PipelineOutput {
   };
 }
 
-/**
- * Legacy respond function (synchronous)
- * @deprecated Use respond() instead
- */
-export function respondSync(message: string): string {
-  const result = processSync({ message });
-  return result.response;
-}
-
-// ============================================
-// DEBUG FUNCTION
-// ============================================
-
-export async function debug(message: string, language: SupportedLanguage = 'en'): Promise<void> {
-  const result = await processWithConcrescence(message, undefined, language);
-  const occasion = result.occasion;
-
-  console.log('\n' + '='.repeat(70));
-  console.log('ENOQ CONCRESCENCE DEBUG');
-  console.log('='.repeat(70));
-  console.log('INPUT:', message);
-  console.log('LANGUAGE:', language);
-
-  console.log('\n--- OCCASION ---');
-  console.log('ID:', occasion.id);
-  console.log('Timestamp:', occasion.timestamp.toISOString());
-
-  console.log('\n--- PRESENT (Dimensional State) ---');
-  if (occasion.present.dimensional_state) {
-    console.log('Primary Vertical:', occasion.present.dimensional_state.primary_vertical);
-    console.log('Primary Horizontal:', occasion.present.dimensional_state.primary_horizontal.join(', '));
-    console.log('V_MODE:', occasion.present.dimensional_state.v_mode_triggered);
-    console.log('Emergency:', occasion.present.dimensional_state.emergency_detected);
-    console.log('Phi:', occasion.present.dimensional_state.integration.phi.toFixed(3));
-  }
-
-  console.log('\n--- FIELD STATE ---');
-  if (occasion.present.field_state) {
-    console.log('Domains:', occasion.present.field_state.domains?.map(d =>
-      `${d.domain} (${d.salience.toFixed(2)})`
-    ).join(', ') || 'N/A');
-    console.log('Arousal:', occasion.present.field_state.arousal);
-    console.log('Valence:', occasion.present.field_state.valence);
-    console.log('Goal:', occasion.present.field_state.goal);
-  }
-
-  console.log('\n--- CONCRESCENCE ---');
-  console.log('Prehensions:', occasion.concrescence.prehensions.length);
-  console.log('Tensions:', occasion.concrescence.tensions.map(t =>
-    `${t.nature} (${t.severity.toFixed(2)})`
-  ).join(', ') || 'none');
-  console.log('Coherences:', occasion.concrescence.coherences.map(c =>
-    `${c.on} (${c.strength.toFixed(2)})`
-  ).join(', ') || 'none');
-
-  console.log('\n--- SATISFACTION ---');
-  console.log('Primitive:', occasion.concrescence.satisfaction.primitive);
-  console.log('Atmosphere:', occasion.concrescence.satisfaction.atmosphere);
-  console.log('Depth:', occasion.concrescence.satisfaction.depth);
-  console.log('Confidence:', occasion.concrescence.satisfaction.confidence.toFixed(2));
-  console.log('Constitutional:', occasion.concrescence.satisfaction.constitutional_verified ? 'PASS' : 'FAIL');
-
-  console.log('\n--- RESPONSE ---');
-  console.log(occasion.future.response);
-
-  console.log('\n--- PREDICTED EFFECT ---');
-  console.log('Expected State:', occasion.future.predicted_effect.expected_user_state);
-  console.log('Autonomy Impact:', occasion.future.predicted_effect.autonomy_impact);
-
-  console.log('='.repeat(70) + '\n');
-}
-
-// ============================================
-// COMPONENT EXPORTS
-// ============================================
-
-// Perception
-export { perceive } from './perception';
-
-// Selection
-export { select } from './selection';
-
-// Generation
-export { generate } from './generation';
-
-// Types
-export * from './types';
-
-// Gate client exports
-export {
-  GateClient,
-  GateResult,
-  GateSignalEffect,
-  interpretGateSignal,
-  getGateClient,
-  resetGateClient,
-  GateClientConfig,
-} from './gate_client';
-
-// Full pipeline exports (L1)
-export {
-  enoq,
-  createSession,
-  Session,
-  Turn,
-  PipelineTrace,
-  PipelineResult,
-  PipelineConfig,
-  conversationLoop,
-  concrescenceConversationLoop,  // Recommended CLI using full Concrescence
-} from './pipeline';
-
-// Total System exports (L2)
-export {
-  TotalSystemOrchestrator,
-  totalSystem,
-  processMessage,
-  TotalSystemInput,
-  TotalSystemOutput,
-  ProcessingContext,
-  ProcessingMetrics,
-} from './total_system';
-
-// Genesis exports
-export {
-  createENOQ,
-  field,
-  creator,
-} from './genesis';
-
-// ============================================
-// v5.0 GATING EXPORTS (NP-calibrated + Lexicon)
-// ============================================
-
-// Existential lexicon (meaning-collapse markers)
-export {
-  scanExistentialLexicon,
-  getBoostedExistentialScore,
-  LexiconMatch,
-  LexiconResult,
-} from './existential_lexicon';
-
-// NP-calibrated gating
-export {
-  NPGating,
-  npGating,
-  NPGatingConfig,
-  NPGatingDecision,
-  NPGatingStats,
-  DEFAULT_NP_CONFIG,
-} from './np_gating';
-
-// v4.0 Scientific gating (fallback)
-export {
-  ScientificGating,
-  scientificGating,
-  CostConfig,
-  GatingDecision,
-  GatingStats,
-  DEFAULT_COST_CONFIG,
-} from './scientific_gating';
-
-// LLM cache
-export {
-  LLMDetectorCache,
-  CacheConfig,
-  CacheStats,
-} from './llm_cache';
-
-// ============================================
-// v5.1 UNIFIED GATING (Cache + Hard Skip + NP)
-// ============================================
-
-export {
-  UnifiedGating,
-  unifiedGating,
-  UnifiedGatingConfig,
-  UnifiedGatingDecision,
-  UnifiedGatingStats,
-  SkipReason,
-  DEFAULT_UNIFIED_CONFIG,
-} from './unified_gating';
-
 // ============================================
 // DEFAULT EXPORT
 // ============================================
 
 export default {
-  // Primary API
   process,
   respond,
-  debug,
   processWithConcrescence,
   concrescenceEngine,
-
-  // Legacy (sync)
   processSync,
-  respondSync,
 };
