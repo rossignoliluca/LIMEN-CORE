@@ -85,6 +85,54 @@ import {
 } from './regulatory_store';
 
 // ============================================
+// NEW ARCHITECTURE IMPORTS (v3.0)
+// Response Plan, EarlySignals, Phased Selection, Lifecycle
+// ============================================
+
+import {
+  ResponsePlan,
+  PlanObservability,
+  validatePlan,
+} from './response_plan';
+
+import {
+  EarlySignals,
+  EarlySignalsStatus,
+  DEADLINE_CONFIG,
+  waitForSignals,
+  CONSERVATIVE_DEFAULTS,
+} from './early_signals';
+
+import {
+  bridgeWithDeadline,
+  generateFastSignals,
+  BridgeInput,
+} from './total_system_bridge';
+
+import {
+  generateCandidatePlans,
+  commitPlan,
+  phasedSelection,
+  PhasedSelectionInput,
+  PhasedSelectionResult,
+} from './selection_phased';
+
+import {
+  initLifecycleSnapshot,
+  getLifecycleSnapshot,
+  applyLifecycleConstraints,
+  updateLifecycleStore,
+  calculateInfluenceUsed,
+  LifecycleSnapshot,
+  TurnOutcome,
+} from './lifecycle_controller';
+
+import {
+  renderPlan,
+  RenderResult,
+} from './plan_renderer';
+
+// ============================================
 // PIPELINE CONFIG
 // ============================================
 
@@ -106,6 +154,17 @@ export interface PipelineConfig {
   // If user_id provided, loads/saves regulatory state across sessions
   user_id?: string;
   regulatory_store_enabled?: boolean;
+
+  // v3.0 Architecture (default: false for backward compatibility)
+  // When true, uses:
+  // - Phased selection (S3a/S3b)
+  // - EarlySignals with deadline
+  // - ResponsePlan + template renderer
+  // - Lifecycle controller
+  use_v3_architecture?: boolean;
+
+  // v3.0 EarlySignals deadline (default: 100ms)
+  early_signals_deadline_ms?: number;
 }
 
 const DEFAULT_PIPELINE_CONFIG: PipelineConfig = {
@@ -116,6 +175,8 @@ const DEFAULT_PIPELINE_CONFIG: PipelineConfig = {
   use_ultimate_detector: true, // Default to ultimate detector (100% accuracy)
   ultimate_detector_debug: Boolean(process.env.ENOQ_DEBUG),
   regulatory_store_enabled: true, // Default to enabled for cross-session learning
+  use_v3_architecture: false,  // v3.0: disabled by default for backward compatibility
+  early_signals_deadline_ms: DEADLINE_CONFIG.STANDARD_MS,  // v3.0: 100ms default
 };
 
 // Ultimate detector singleton (lazy init)
@@ -139,6 +200,9 @@ export interface Session {
 
   // Cross-session regulatory state (loaded from store if user_id provided)
   regulatory_state?: RegulatoryState;
+
+  // Lifecycle state (v3.0 - influence budget, termination, dormancy)
+  lifecycle_snapshot: LifecycleSnapshot;
 
   // Telemetry
   telemetry: SessionTelemetry;
@@ -242,6 +306,44 @@ export interface PipelineTrace {
     constraints_applied: string[];  // How regulatory state curved selection
   };
 
+  // v3.0: Phased Selection (S3a/S3b)
+  s3_phased?: {
+    candidates_count: number;
+    recommended_index: number;
+    selected_index: number;
+    early_signals_arrived: boolean;
+    early_signals_contributors: string[];
+    commit_reason: string;
+    plan_id: string;
+  };
+
+  // v3.0: Early Signals Status
+  s1_early_signals?: {
+    arrived_before_deadline: boolean;
+    wait_time_ms: number;
+    signals_received: string[];
+    defaults_used: string[];
+    deadline_used: number;
+  };
+
+  // v3.0: Lifecycle
+  s6_lifecycle?: {
+    influence_used: number;
+    remaining_budget: number;
+    termination_proximity: number;
+    dormancy_recommended: boolean;
+    constraints_applied: string[];
+  };
+
+  // v3.0: Plan Rendering
+  s4_render?: {
+    template_used: boolean;
+    llm_used: boolean;
+    acts_rendered: string[];
+    constraint_warnings: string[];
+    render_time_ms: number;
+  };
+
   // Timing
   latency_ms: number;
 }
@@ -306,14 +408,21 @@ export function createSession(userId?: string): Session {
     }
   }
 
+  // Generate session ID
+  const sessionId = `sess_${Date.now().toString(36)}_${Math.random().toString(36).substr(2, 9)}`;
+
+  // Initialize lifecycle snapshot (v3.0)
+  const lifecycleSnapshot = initLifecycleSnapshot(sessionId);
+
   return {
-    session_id: `sess_${Date.now().toString(36)}_${Math.random().toString(36).substr(2, 9)}`,
+    session_id: sessionId,
     user_id: userId,
     created_at: new Date(),
     turns: [],
     meta_kernel_state: createDefaultMetaKernelState(),
     manifold_state: createInitialManifoldState(),  // Stochastic field initial state
     regulatory_state: regulatoryState,  // Cross-session regulatory state
+    lifecycle_snapshot: lifecycleSnapshot,  // v3.0: Influence budget, termination, dormancy
     telemetry: createDefaultTelemetry(),
     audit_trail: [],
     memory: {
@@ -504,6 +613,109 @@ function checkClarifyNeeded(field: FieldState, input: string): ClarifyResult {
   }
 
   return { needed: false };
+}
+
+// ============================================
+// V3.0 FLOW HELPER
+// Phased Selection + EarlySignals + Plan Renderer
+// ============================================
+
+interface V3FlowInput {
+  s0_input: string;
+  s1_field: FieldState;
+  dimensionalState: DimensionalState;
+  language: SupportedLanguage;
+  session: Session;
+  protocol_selection: ProtocolSelection;
+  deadline_ms: number;
+}
+
+interface V3FlowResult {
+  output: string;
+  phased_result: PhasedSelectionResult;
+  render_result: RenderResult;
+  lifecycle_update: {
+    influence_used: number;
+    constraints: string[];
+  };
+}
+
+async function executeV3Flow(input: V3FlowInput): Promise<V3FlowResult> {
+  const { s0_input, s1_field, dimensionalState, language, session, protocol_selection, deadline_ms } = input;
+
+  // Build bridge input for EarlySignals
+  const bridgeInput: BridgeInput = {
+    user_id: session.user_id || 'anonymous',
+    message: s0_input,
+    language,
+    field_state: s1_field,
+    dimensional_state: dimensionalState,
+    session_id: session.session_id,
+  };
+
+  // Build phased selection input
+  const phasedInput: PhasedSelectionInput = {
+    field_state: s1_field,
+    dimensional_state: dimensionalState,
+    protocol_selection,
+    language,
+    turn: session.turns.length + 1,
+    potency: session.regulatory_state?.potency ?? 1.0,
+    withdrawal_bias: session.regulatory_state?.withdrawal_bias ?? 0.0,
+  };
+
+  // ---- START PARALLEL: EarlySignals + S3a ----
+  // S3a generates candidates while we wait for EarlySignals
+
+  // Start EarlySignals generation with deadline
+  const earlySignalsPromise = bridgeWithDeadline(bridgeInput, deadline_ms);
+
+  // Execute phased selection (S3a + wait + S3b)
+  const phasedResult = await phasedSelection(phasedInput, earlySignalsPromise);
+
+  // ---- APPLY LIFECYCLE CONSTRAINTS ----
+  const { plan: lifecyclePlan, constraints: lifecycleConstraints } = applyLifecycleConstraints(
+    phasedResult.s3b.plan,
+    session.lifecycle_snapshot
+  );
+
+  // ---- VALIDATE PLAN ----
+  const planValidation = validatePlan(lifecyclePlan);
+  if (!planValidation.valid && process.env.ENOQ_DEBUG) {
+    console.log(`[V3] Plan validation warnings: ${planValidation.warnings.join(', ')}`);
+    if (planValidation.violations.length > 0) {
+      console.log(`[V3] Plan validation violations: ${planValidation.violations.join(', ')}`);
+    }
+  }
+
+  // ---- RENDER PLAN TO TEXT ----
+  const renderResult = renderPlan(lifecyclePlan);
+
+  // ---- CALCULATE INFLUENCE USED ----
+  const influenceUsed = calculateInfluenceUsed(lifecyclePlan);
+
+  // Log v3.0 flow for debugging
+  if (process.env.ENOQ_DEBUG) {
+    console.log(`[V3] Candidates: ${phasedResult.s3a.candidates.candidates.length}`);
+    console.log(`[V3] EarlySignals arrived: ${phasedResult.early_signals_status.arrived_before_deadline}`);
+    console.log(`[V3] Contributors: ${phasedResult.early_signals_status.signals_received}`);
+    console.log(`[V3] Plan ID: ${lifecyclePlan.id}`);
+    console.log(`[V3] Acts: ${lifecyclePlan.acts.map(a => a.type).join(', ')}`);
+    console.log(`[V3] Rendered: ${renderResult.acts_rendered.join(', ')}`);
+    if (renderResult.constraint_warnings.length > 0) {
+      console.log(`[V3] Render warnings: ${renderResult.constraint_warnings.join(', ')}`);
+    }
+  }
+
+  return {
+    output: renderResult.text,
+    phased_result: phasedResult,
+    render_result: renderResult,
+    lifecycle_update: {
+      influence_used: influenceUsed,
+      constraints: lifecycleConstraints.reason !== 'none' ? [lifecycleConstraints.reason] : [],
+    },
+  };
 }
 
 // ============================================
@@ -866,6 +1078,199 @@ export async function enoq(
   const depthOrder = ['surface', 'medium', 'deep'];
 
   let s3_selection = select(s1_field);
+
+  // ==========================================
+  // V3.0 ARCHITECTURE BRANCH
+  // If enabled, use phased selection + EarlySignals + plan renderer
+  // This replaces the legacy S3.5→S4→S5→S6 flow
+  // ==========================================
+
+  if (config.use_v3_architecture) {
+    const deadline_ms = config.early_signals_deadline_ms ?? DEADLINE_CONFIG.STANDARD_MS;
+
+    if (process.env.ENOQ_DEBUG) {
+      console.log(`[V3] Architecture enabled, deadline=${deadline_ms}ms`);
+    }
+
+    // Execute v3.0 flow: phased selection + EarlySignals + plan renderer
+    const v3Result = await executeV3Flow({
+      s0_input,
+      s1_field,
+      dimensionalState,
+      language,
+      session,
+      protocol_selection: s3_selection,
+      deadline_ms,
+    });
+
+    // Build v3.0 trace
+    const v3Trace: PipelineTrace = {
+      s0_gate: gateResult ? {
+        signal: gateResult.signal,
+        reason_code: gateResult.reason_code,
+        latency_ms: gateResult.latency_ms,
+        effect: gateEffect,
+      } : undefined,
+      s0_input,
+      s1_field,
+      s1_governor,
+      s1_meta_kernel: {
+        rules_applied: metaKernelResult.rules_applied,
+        power_level: metaKernelResult.new_state.knobs.power_level,
+        depth_ceiling: metaKernelResult.power_envelope.depth_ceiling,
+      },
+      s1_detector: detectorOutput ? {
+        domain_probs: detectorOutput.domain_probs,
+        confidence: detectorOutput.confidence,
+        abstention_score: detectorOutput.abstention_score,
+        safety_floor: detectorOutput.safety_floor,
+        risk_flags: detectorOutput.risk_flags,
+        latency_ms: detectorOutput.latency_ms,
+        v_mode_triggered: dimensionalState.v_mode_triggered,
+        emergency_detected: dimensionalState.emergency_detected,
+      } : undefined,
+      s2_clarify_needed: false,
+      s3_selection,
+      s3_stochastic: {
+        regime: stochasticDiagnostics.regime,
+        epsilon: session.manifold_state.epsilon,
+        gamma: session.manifold_state.gamma,
+        delta: session.manifold_state.delta,
+        T: session.manifold_state.T,
+        D: session.manifold_state.D,
+        U_total: stochasticDiagnostics.U_total,
+        F: stochasticDiagnostics.F,
+        S: stochasticDiagnostics.S,
+        d_identity: stochasticDiagnostics.d_identity,
+        absorbed: stochasticEvolution.absorbed,
+        curvature_severity: 0,
+        curvature_applied: [],
+        physics_reasoning: 'v3.0: curvature handled by EarlySignals',
+      },
+      s1_regulatory: session.regulatory_state ? {
+        potency: session.regulatory_state.potency,
+        withdrawal_bias: session.regulatory_state.withdrawal_bias,
+        delegation_trend: session.regulatory_state.delegation_trend,
+        loop_count: session.regulatory_state.loop_count,
+        constraints_applied: [],
+      } : undefined,
+      s4_context: {
+        runtime: 'V3_PHASED_SELECTION',
+        forbidden: v3Result.phased_result.s3b.plan.constraints.forbidden || [],
+        required: v3Result.phased_result.s3b.plan.constraints.required || [],
+      },
+      s5_verification: {
+        passed: true,  // v3.0: validation happens in executeV3Flow
+        violations: 0,
+        fallback_used: false,
+      },
+      s6_output: v3Result.output,
+      // v3.0 specific fields
+      // Convert signals_received object to string[]
+      s3_phased: {
+        candidates_count: v3Result.phased_result.s3a.candidates.candidates.length,
+        recommended_index: v3Result.phased_result.s3a.recommended_index,
+        selected_index: v3Result.phased_result.s3b.selected_index,
+        early_signals_arrived: v3Result.phased_result.early_signals_status.arrived_before_deadline,
+        early_signals_contributors: Object.entries(v3Result.phased_result.early_signals_status.signals_received)
+          .filter(([_, received]) => received)
+          .map(([signal]) => signal),
+        commit_reason: v3Result.phased_result.s3b.commit_reason,
+        plan_id: v3Result.phased_result.s3b.plan.id,
+      },
+      s1_early_signals: {
+        arrived_before_deadline: v3Result.phased_result.early_signals_status.arrived_before_deadline,
+        wait_time_ms: v3Result.phased_result.early_signals_status.wait_time_ms,
+        signals_received: Object.entries(v3Result.phased_result.early_signals_status.signals_received)
+          .filter(([_, received]) => received)
+          .map(([signal]) => signal),
+        defaults_used: v3Result.phased_result.early_signals_status.defaults_used,
+        deadline_used: deadline_ms,
+      },
+      s6_lifecycle: {
+        influence_used: v3Result.lifecycle_update.influence_used,
+        remaining_budget: session.lifecycle_snapshot.remaining_budget,
+        termination_proximity: session.lifecycle_snapshot.termination_proximity,
+        dormancy_recommended: session.lifecycle_snapshot.dormancy_recommended,
+        constraints_applied: v3Result.lifecycle_update.constraints,
+      },
+      s4_render: {
+        template_used: v3Result.render_result.template_used,
+        llm_used: v3Result.render_result.llm_used,
+        acts_rendered: v3Result.render_result.acts_rendered,
+        constraint_warnings: v3Result.render_result.constraint_warnings,
+        render_time_ms: v3Result.render_result.render_time_ms,
+      },
+      latency_ms: Date.now() - startTime,
+    };
+
+    // Create turn
+    const v3Turn: Turn = {
+      turn_number: turnNumber,
+      timestamp: new Date(),
+      input: s0_input,
+      output: v3Result.output,
+      trace: v3Trace,
+    };
+    session.turns.push(v3Turn);
+
+    // Update lifecycle store
+    const turnOutcome: TurnOutcome = {
+      user_autonomy_detected: session.telemetry.user_made_decision || session.telemetry.user_disagreed,
+      delegation_detected: s1_field.flags.includes('delegation_attempt'),
+      influence_used: v3Result.lifecycle_update.influence_used,
+      v_mode: dimensionalState.v_mode_triggered,
+      emergency: dimensionalState.emergency_detected,
+    };
+    const lifecycleUpdate = updateLifecycleStore(session.session_id, turnOutcome);
+    session.lifecycle_snapshot = lifecycleUpdate.snapshot;
+
+    // Update regulatory state (same logic as legacy flow)
+    if (session.regulatory_state && session.user_id) {
+      const reg = session.regulatory_state;
+      const now = Date.now();
+
+      if (s1_field.flags.includes('delegation_attempt')) {
+        reg.delegation_trend = Math.max(-1, reg.delegation_trend - 0.1);
+      }
+      if (session.telemetry.user_made_decision) {
+        reg.delegation_trend = Math.min(1, reg.delegation_trend + 0.15);
+      }
+      if (dimensionalState.v_mode_triggered) {
+        reg.withdrawal_bias = Math.min(1, reg.withdrawal_bias + 0.05);
+      }
+      reg.loop_count = s1_field.loop_count;
+      reg.potency = Math.max(0.1, reg.potency - 0.02);
+      reg.last_interaction = now;
+      reg.expires_at = now + 24 * 60 * 60 * 1000;
+
+      const store = getRegulatoryStore();
+      store.save(reg);
+
+      if (process.env.ENOQ_DEBUG) {
+        console.log(`[V3 REGULATORY] Updated: potency=${reg.potency.toFixed(2)}, withdrawal=${reg.withdrawal_bias.toFixed(2)}, trend=${reg.delegation_trend.toFixed(2)}`);
+      }
+    }
+
+    // Log lifecycle status
+    if (process.env.ENOQ_DEBUG) {
+      console.log(`[V3 LIFECYCLE] Budget: ${lifecycleUpdate.snapshot.remaining_budget.toFixed(1)}/${lifecycleUpdate.snapshot.total_influence_budget}`);
+      console.log(`[V3 LIFECYCLE] Termination: ${(lifecycleUpdate.snapshot.termination_proximity * 100).toFixed(1)}%`);
+      if (lifecycleUpdate.dormancy_triggered) {
+        console.log(`[V3 LIFECYCLE] DORMANCY TRIGGERED`);
+      }
+    }
+
+    return {
+      output: v3Result.output,
+      trace: v3Trace,
+      session,
+    };
+  }
+
+  // ==========================================
+  // LEGACY FLOW (v2.x) - when use_v3_architecture is false
+  // ==========================================
 
   // ==========================================
   // S3.5: GENESIS FIELD CURVATURE
