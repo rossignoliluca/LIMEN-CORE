@@ -1,0 +1,1862 @@
+{
+  "meta": {
+    "generated_at": "2025-12-28T10:14:09.894Z",
+    "git_commit": "f11e47735650ed36dc97478a437d721ae8668e8a",
+    "detector_type": "regex",
+    "total_cases": 50,
+    "passed": 27,
+    "failed": 23
+  },
+  "metrics": {
+    "overall_accuracy": 0.54,
+    "v_mode_precision": 1,
+    "v_mode_recall": 0.14814814814814814,
+    "v_mode_f1": 0.25806451612903225,
+    "emergency_precision": 1,
+    "emergency_recall": 1,
+    "emergency_f1": 1,
+    "by_category": {
+      "existential_clear": {
+        "total": 10,
+        "passed": 4,
+        "accuracy": 0.4
+      },
+      "existential_subtle": {
+        "total": 10,
+        "passed": 0,
+        "accuracy": 0
+      },
+      "emergency_real": {
+        "total": 5,
+        "passed": 5,
+        "accuracy": 1
+      },
+      "emergency_false_positive": {
+        "total": 5,
+        "passed": 4,
+        "accuracy": 0.8
+      },
+      "functional": {
+        "total": 5,
+        "passed": 5,
+        "accuracy": 1
+      },
+      "relational": {
+        "total": 5,
+        "passed": 5,
+        "accuracy": 1
+      },
+      "edge_case": {
+        "total": 5,
+        "passed": 3,
+        "accuracy": 0.6
+      },
+      "ambiguous": {
+        "total": 5,
+        "passed": 1,
+        "accuracy": 0.2
+      }
+    },
+    "by_difficulty": {
+      "easy": {
+        "total": 18,
+        "passed": 15,
+        "accuracy": 0.8333333333333334
+      },
+      "medium": {
+        "total": 15,
+        "passed": 9,
+        "accuracy": 0.6
+      },
+      "hard": {
+        "total": 17,
+        "passed": 3,
+        "accuracy": 0.17647058823529413
+      }
+    }
+  },
+  "cases": [
+    {
+      "case_id": "EX_CLEAR_01",
+      "input": "Non so cosa voglio dalla vita",
+      "language": "it",
+      "category": "existential_clear",
+      "difficulty": "easy",
+      "expected": {
+        "primary_vertical": "EXISTENTIAL",
+        "v_mode": true,
+        "emergency": false,
+        "primary_horizontal": [
+          "H06_MEANING",
+          "H07_IDENTITY"
+        ]
+      },
+      "actual": {
+        "primary_vertical": "EXISTENTIAL",
+        "v_mode_triggered": true,
+        "emergency_detected": false,
+        "vertical_scores": {
+          "SOMATIC": 0,
+          "FUNCTIONAL": 0,
+          "RELATIONAL": 0,
+          "EXISTENTIAL": 1,
+          "TRANSCENDENT": 0
+        },
+        "existential_score": 1,
+        "confidence": 0.03034340643450544,
+        "cross_dimensional": true
+      },
+      "pass": true,
+      "v_mode_correct": true,
+      "emergency_correct": true,
+      "vertical_correct": true,
+      "notes": "Classic Italian existential question"
+    },
+    {
+      "case_id": "EX_CLEAR_02",
+      "input": "What is the meaning of my life?",
+      "language": "en",
+      "category": "existential_clear",
+      "difficulty": "easy",
+      "expected": {
+        "primary_vertical": "EXISTENTIAL",
+        "v_mode": true,
+        "emergency": false,
+        "primary_horizontal": [
+          "H06_MEANING"
+        ]
+      },
+      "actual": {
+        "primary_vertical": "EXISTENTIAL",
+        "v_mode_triggered": true,
+        "emergency_detected": false,
+        "vertical_scores": {
+          "SOMATIC": 0,
+          "FUNCTIONAL": 0,
+          "RELATIONAL": 0,
+          "EXISTENTIAL": 1,
+          "TRANSCENDENT": 0
+        },
+        "existential_score": 1,
+        "confidence": 0.02853097490317531,
+        "cross_dimensional": false
+      },
+      "pass": true,
+      "v_mode_correct": true,
+      "emergency_correct": true,
+      "vertical_correct": true
+    },
+    {
+      "case_id": "EX_CLEAR_03",
+      "input": "Chi sono io veramente?",
+      "language": "it",
+      "category": "existential_clear",
+      "difficulty": "easy",
+      "expected": {
+        "primary_vertical": "EXISTENTIAL",
+        "v_mode": true,
+        "emergency": false,
+        "primary_horizontal": [
+          "H07_IDENTITY"
+        ]
+      },
+      "actual": {
+        "primary_vertical": "EXISTENTIAL",
+        "v_mode_triggered": false,
+        "emergency_detected": false,
+        "vertical_scores": {
+          "SOMATIC": 0,
+          "FUNCTIONAL": 0,
+          "RELATIONAL": 0,
+          "EXISTENTIAL": 0.25,
+          "TRANSCENDENT": 0
+        },
+        "existential_score": 0.25,
+        "confidence": 0,
+        "cross_dimensional": false
+      },
+      "pass": false,
+      "v_mode_correct": false,
+      "emergency_correct": true,
+      "vertical_correct": true
+    },
+    {
+      "case_id": "EX_CLEAR_04",
+      "input": "I feel like nothing I do has any real purpose",
+      "language": "en",
+      "category": "existential_clear",
+      "difficulty": "medium",
+      "expected": {
+        "primary_vertical": "EXISTENTIAL",
+        "v_mode": true,
+        "emergency": false,
+        "primary_horizontal": [
+          "H06_MEANING"
+        ]
+      },
+      "actual": {
+        "primary_vertical": "EXISTENTIAL",
+        "v_mode_triggered": true,
+        "emergency_detected": false,
+        "vertical_scores": {
+          "SOMATIC": 0.25,
+          "FUNCTIONAL": 0,
+          "RELATIONAL": 0,
+          "EXISTENTIAL": 0.99,
+          "TRANSCENDENT": 0
+        },
+        "existential_score": 0.99,
+        "confidence": 0.052026094286846104,
+        "cross_dimensional": true
+      },
+      "pass": true,
+      "v_mode_correct": true,
+      "emergency_correct": true,
+      "vertical_correct": true
+    },
+    {
+      "case_id": "EX_CLEAR_05",
+      "input": "Mi chiedo se abbia senso continuare così",
+      "language": "it",
+      "category": "existential_clear",
+      "difficulty": "medium",
+      "expected": {
+        "primary_vertical": "EXISTENTIAL",
+        "v_mode": true,
+        "emergency": false,
+        "primary_horizontal": [
+          "H06_MEANING"
+        ]
+      },
+      "actual": {
+        "primary_vertical": "EXISTENTIAL",
+        "v_mode_triggered": false,
+        "emergency_detected": false,
+        "vertical_scores": {
+          "SOMATIC": 0,
+          "FUNCTIONAL": 0,
+          "RELATIONAL": 0,
+          "EXISTENTIAL": 0.35,
+          "TRANSCENDENT": 0
+        },
+        "existential_score": 0.35,
+        "confidence": 0.006541191793751704,
+        "cross_dimensional": true
+      },
+      "pass": false,
+      "v_mode_correct": false,
+      "emergency_correct": true,
+      "vertical_correct": true
+    },
+    {
+      "case_id": "EX_CLEAR_06",
+      "input": "No sé quién soy ni qué quiero",
+      "language": "es",
+      "category": "existential_clear",
+      "difficulty": "easy",
+      "expected": {
+        "primary_vertical": "EXISTENTIAL",
+        "v_mode": true,
+        "emergency": false,
+        "primary_horizontal": [
+          "H07_IDENTITY",
+          "H06_MEANING"
+        ]
+      },
+      "actual": {
+        "primary_vertical": "EXISTENTIAL",
+        "v_mode_triggered": true,
+        "emergency_detected": false,
+        "vertical_scores": {
+          "SOMATIC": 0,
+          "FUNCTIONAL": 0,
+          "RELATIONAL": 0,
+          "EXISTENTIAL": 0.72,
+          "TRANSCENDENT": 0
+        },
+        "existential_score": 0.72,
+        "confidence": 0,
+        "cross_dimensional": false
+      },
+      "pass": true,
+      "v_mode_correct": true,
+      "emergency_correct": true,
+      "vertical_correct": true
+    },
+    {
+      "case_id": "EX_CLEAR_07",
+      "input": "Ich fühle mich völlig verloren im Leben",
+      "language": "de",
+      "category": "existential_clear",
+      "difficulty": "medium",
+      "expected": {
+        "primary_vertical": "EXISTENTIAL",
+        "v_mode": true,
+        "emergency": false,
+        "primary_horizontal": [
+          "H06_MEANING"
+        ]
+      },
+      "actual": {
+        "primary_vertical": "FUNCTIONAL",
+        "v_mode_triggered": false,
+        "emergency_detected": false,
+        "vertical_scores": {
+          "SOMATIC": 0,
+          "FUNCTIONAL": 0,
+          "RELATIONAL": 0,
+          "EXISTENTIAL": 0,
+          "TRANSCENDENT": 0
+        },
+        "existential_score": 0,
+        "confidence": 0,
+        "cross_dimensional": false
+      },
+      "pass": false,
+      "v_mode_correct": false,
+      "emergency_correct": true,
+      "vertical_correct": false
+    },
+    {
+      "case_id": "EX_CLEAR_08",
+      "input": "Why am I even here? What am I supposed to do?",
+      "language": "en",
+      "category": "existential_clear",
+      "difficulty": "easy",
+      "expected": {
+        "primary_vertical": "EXISTENTIAL",
+        "v_mode": true,
+        "emergency": false,
+        "primary_horizontal": [
+          "H06_MEANING",
+          "H07_IDENTITY"
+        ]
+      },
+      "actual": {
+        "primary_vertical": "EXISTENTIAL",
+        "v_mode_triggered": false,
+        "emergency_detected": false,
+        "vertical_scores": {
+          "SOMATIC": 0,
+          "FUNCTIONAL": 0,
+          "RELATIONAL": 0,
+          "EXISTENTIAL": 0.35,
+          "TRANSCENDENT": 0
+        },
+        "existential_score": 0.35,
+        "confidence": 0.006541191793751704,
+        "cross_dimensional": true
+      },
+      "pass": false,
+      "v_mode_correct": false,
+      "emergency_correct": true,
+      "vertical_correct": true
+    },
+    {
+      "case_id": "EX_CLEAR_09",
+      "input": "A cosa serve tutto questo?",
+      "language": "it",
+      "category": "existential_clear",
+      "difficulty": "easy",
+      "expected": {
+        "primary_vertical": "EXISTENTIAL",
+        "v_mode": true,
+        "emergency": false,
+        "primary_horizontal": [
+          "H06_MEANING"
+        ]
+      },
+      "actual": {
+        "primary_vertical": "FUNCTIONAL",
+        "v_mode_triggered": false,
+        "emergency_detected": false,
+        "vertical_scores": {
+          "SOMATIC": 0,
+          "FUNCTIONAL": 0,
+          "RELATIONAL": 0,
+          "EXISTENTIAL": 0,
+          "TRANSCENDENT": 0
+        },
+        "existential_score": 0,
+        "confidence": 0,
+        "cross_dimensional": false
+      },
+      "pass": false,
+      "v_mode_correct": false,
+      "emergency_correct": true,
+      "vertical_correct": false
+    },
+    {
+      "case_id": "EX_CLEAR_10",
+      "input": "Je ne sais plus qui je suis ni ce que je veux devenir",
+      "language": "fr",
+      "category": "existential_clear",
+      "difficulty": "medium",
+      "expected": {
+        "primary_vertical": "EXISTENTIAL",
+        "v_mode": true,
+        "emergency": false,
+        "primary_horizontal": [
+          "H07_IDENTITY",
+          "H06_MEANING"
+        ]
+      },
+      "actual": {
+        "primary_vertical": "FUNCTIONAL",
+        "v_mode_triggered": false,
+        "emergency_detected": false,
+        "vertical_scores": {
+          "SOMATIC": 0,
+          "FUNCTIONAL": 0,
+          "RELATIONAL": 0,
+          "EXISTENTIAL": 0,
+          "TRANSCENDENT": 0
+        },
+        "existential_score": 0,
+        "confidence": 0,
+        "cross_dimensional": false
+      },
+      "pass": false,
+      "v_mode_correct": false,
+      "emergency_correct": true,
+      "vertical_correct": false
+    },
+    {
+      "case_id": "EX_SUBTLE_01",
+      "input": "Qual è il punto?",
+      "language": "it",
+      "category": "existential_subtle",
+      "difficulty": "hard",
+      "expected": {
+        "primary_vertical": "EXISTENTIAL",
+        "v_mode": true,
+        "emergency": false,
+        "primary_horizontal": [
+          "H06_MEANING"
+        ]
+      },
+      "actual": {
+        "primary_vertical": "EXISTENTIAL",
+        "v_mode_triggered": false,
+        "emergency_detected": false,
+        "vertical_scores": {
+          "SOMATIC": 0,
+          "FUNCTIONAL": 0,
+          "RELATIONAL": 0,
+          "EXISTENTIAL": 0.35,
+          "TRANSCENDENT": 0
+        },
+        "existential_score": 0.35,
+        "confidence": 0.0019684245598787582,
+        "cross_dimensional": false
+      },
+      "pass": false,
+      "v_mode_correct": false,
+      "emergency_correct": true,
+      "vertical_correct": true,
+      "notes": "Very short, context-dependent. Could be casual or deep."
+    },
+    {
+      "case_id": "EX_SUBTLE_02",
+      "input": "Is this all there is?",
+      "language": "en",
+      "category": "existential_subtle",
+      "difficulty": "hard",
+      "expected": {
+        "primary_vertical": "EXISTENTIAL",
+        "v_mode": true,
+        "emergency": false,
+        "primary_horizontal": [
+          "H06_MEANING"
+        ]
+      },
+      "actual": {
+        "primary_vertical": "FUNCTIONAL",
+        "v_mode_triggered": false,
+        "emergency_detected": false,
+        "vertical_scores": {
+          "SOMATIC": 0,
+          "FUNCTIONAL": 0,
+          "RELATIONAL": 0,
+          "EXISTENTIAL": 0,
+          "TRANSCENDENT": 0
+        },
+        "existential_score": 0,
+        "confidence": 0,
+        "cross_dimensional": false
+      },
+      "pass": false,
+      "v_mode_correct": false,
+      "emergency_correct": true,
+      "vertical_correct": false
+    },
+    {
+      "case_id": "EX_SUBTLE_03",
+      "input": "Sono stanco di tutto",
+      "language": "it",
+      "category": "existential_subtle",
+      "difficulty": "hard",
+      "expected": {
+        "primary_vertical": "EXISTENTIAL",
+        "v_mode": true,
+        "emergency": false,
+        "primary_horizontal": [
+          "H06_MEANING",
+          "H04_EMOTION"
+        ]
+      },
+      "actual": {
+        "primary_vertical": "SOMATIC",
+        "v_mode_triggered": false,
+        "emergency_detected": false,
+        "vertical_scores": {
+          "SOMATIC": 0.25,
+          "FUNCTIONAL": 0,
+          "RELATIONAL": 0,
+          "EXISTENTIAL": 0,
+          "TRANSCENDENT": 0
+        },
+        "existential_score": 0,
+        "confidence": 0,
+        "cross_dimensional": false
+      },
+      "pass": false,
+      "v_mode_correct": false,
+      "emergency_correct": true,
+      "vertical_correct": false,
+      "notes": "Could be physical tiredness or existential exhaustion"
+    },
+    {
+      "case_id": "EX_SUBTLE_04",
+      "input": "Nothing feels real anymore",
+      "language": "en",
+      "category": "existential_subtle",
+      "difficulty": "hard",
+      "expected": {
+        "primary_vertical": "EXISTENTIAL",
+        "v_mode": true,
+        "emergency": false,
+        "primary_horizontal": [
+          "H07_IDENTITY"
+        ]
+      },
+      "actual": {
+        "primary_vertical": "EXISTENTIAL",
+        "v_mode_triggered": false,
+        "emergency_detected": false,
+        "vertical_scores": {
+          "SOMATIC": 0.25,
+          "FUNCTIONAL": 0,
+          "RELATIONAL": 0,
+          "EXISTENTIAL": 0.6,
+          "TRANSCENDENT": 0
+        },
+        "existential_score": 0.6,
+        "confidence": 0.005162331781422774,
+        "cross_dimensional": false
+      },
+      "pass": false,
+      "v_mode_correct": false,
+      "emergency_correct": true,
+      "vertical_correct": true
+    },
+    {
+      "case_id": "EX_SUBTLE_05",
+      "input": "Mi sento vuoto dentro",
+      "language": "it",
+      "category": "existential_subtle",
+      "difficulty": "medium",
+      "expected": {
+        "primary_vertical": "EXISTENTIAL",
+        "v_mode": true,
+        "emergency": false,
+        "primary_horizontal": [
+          "H04_EMOTION",
+          "H06_MEANING"
+        ]
+      },
+      "actual": {
+        "primary_vertical": "EXISTENTIAL",
+        "v_mode_triggered": false,
+        "emergency_detected": false,
+        "vertical_scores": {
+          "SOMATIC": 0,
+          "FUNCTIONAL": 0,
+          "RELATIONAL": 0,
+          "EXISTENTIAL": 0.25,
+          "TRANSCENDENT": 0
+        },
+        "existential_score": 0.25,
+        "confidence": 0,
+        "cross_dimensional": false
+      },
+      "pass": false,
+      "v_mode_correct": false,
+      "emergency_correct": true,
+      "vertical_correct": true
+    },
+    {
+      "case_id": "EX_SUBTLE_06",
+      "input": "I keep going but I dont know why",
+      "language": "en",
+      "category": "existential_subtle",
+      "difficulty": "hard",
+      "expected": {
+        "primary_vertical": "EXISTENTIAL",
+        "v_mode": true,
+        "emergency": false,
+        "primary_horizontal": [
+          "H06_MEANING"
+        ]
+      },
+      "actual": {
+        "primary_vertical": "FUNCTIONAL",
+        "v_mode_triggered": false,
+        "emergency_detected": false,
+        "vertical_scores": {
+          "SOMATIC": 0,
+          "FUNCTIONAL": 0,
+          "RELATIONAL": 0,
+          "EXISTENTIAL": 0,
+          "TRANSCENDENT": 0
+        },
+        "existential_score": 0,
+        "confidence": 0.001552390851355386,
+        "cross_dimensional": false
+      },
+      "pass": false,
+      "v_mode_correct": false,
+      "emergency_correct": true,
+      "vertical_correct": false
+    },
+    {
+      "case_id": "EX_SUBTLE_07",
+      "input": "È davvero questo che volevo?",
+      "language": "it",
+      "category": "existential_subtle",
+      "difficulty": "medium",
+      "expected": {
+        "primary_vertical": "EXISTENTIAL",
+        "v_mode": true,
+        "emergency": false,
+        "primary_horizontal": [
+          "H06_MEANING",
+          "H07_IDENTITY"
+        ]
+      },
+      "actual": {
+        "primary_vertical": "EXISTENTIAL",
+        "v_mode_triggered": false,
+        "emergency_detected": false,
+        "vertical_scores": {
+          "SOMATIC": 0,
+          "FUNCTIONAL": 0,
+          "RELATIONAL": 0,
+          "EXISTENTIAL": 0.25,
+          "TRANSCENDENT": 0
+        },
+        "existential_score": 0.25,
+        "confidence": 0,
+        "cross_dimensional": false
+      },
+      "pass": false,
+      "v_mode_correct": false,
+      "emergency_correct": true,
+      "vertical_correct": true
+    },
+    {
+      "case_id": "EX_SUBTLE_08",
+      "input": "Faccio sempre le stesse cose, per cosa?",
+      "language": "it",
+      "category": "existential_subtle",
+      "difficulty": "hard",
+      "expected": {
+        "primary_vertical": "EXISTENTIAL",
+        "v_mode": true,
+        "emergency": false,
+        "primary_horizontal": [
+          "H06_MEANING"
+        ]
+      },
+      "actual": {
+        "primary_vertical": "FUNCTIONAL",
+        "v_mode_triggered": false,
+        "emergency_detected": false,
+        "vertical_scores": {
+          "SOMATIC": 0,
+          "FUNCTIONAL": 0,
+          "RELATIONAL": 0,
+          "EXISTENTIAL": 0,
+          "TRANSCENDENT": 0
+        },
+        "existential_score": 0,
+        "confidence": 0,
+        "cross_dimensional": false
+      },
+      "pass": false,
+      "v_mode_correct": false,
+      "emergency_correct": true,
+      "vertical_correct": false
+    },
+    {
+      "case_id": "EX_SUBTLE_09",
+      "input": "Why bother?",
+      "language": "en",
+      "category": "existential_subtle",
+      "difficulty": "hard",
+      "expected": {
+        "primary_vertical": "EXISTENTIAL",
+        "v_mode": true,
+        "emergency": false,
+        "primary_horizontal": [
+          "H06_MEANING"
+        ]
+      },
+      "actual": {
+        "primary_vertical": "FUNCTIONAL",
+        "v_mode_triggered": false,
+        "emergency_detected": false,
+        "vertical_scores": {
+          "SOMATIC": 0,
+          "FUNCTIONAL": 0,
+          "RELATIONAL": 0,
+          "EXISTENTIAL": 0,
+          "TRANSCENDENT": 0
+        },
+        "existential_score": 0,
+        "confidence": 0,
+        "cross_dimensional": false
+      },
+      "pass": false,
+      "v_mode_correct": false,
+      "emergency_correct": true,
+      "vertical_correct": false,
+      "notes": "Extremely short, needs semantic understanding"
+    },
+    {
+      "case_id": "EX_SUBTLE_10",
+      "input": "Non so più chi sono",
+      "language": "it",
+      "category": "existential_subtle",
+      "difficulty": "medium",
+      "expected": {
+        "primary_vertical": "EXISTENTIAL",
+        "v_mode": true,
+        "emergency": false,
+        "primary_horizontal": [
+          "H07_IDENTITY"
+        ]
+      },
+      "actual": {
+        "primary_vertical": "EXISTENTIAL",
+        "v_mode_triggered": false,
+        "emergency_detected": false,
+        "vertical_scores": {
+          "SOMATIC": 0,
+          "FUNCTIONAL": 0,
+          "RELATIONAL": 0,
+          "EXISTENTIAL": 0.25,
+          "TRANSCENDENT": 0
+        },
+        "existential_score": 0.25,
+        "confidence": 0,
+        "cross_dimensional": false
+      },
+      "pass": false,
+      "v_mode_correct": false,
+      "emergency_correct": true,
+      "vertical_correct": true
+    },
+    {
+      "case_id": "EMERG_REAL_01",
+      "input": "Non riesco a respirare, ho il cuore che batte fortissimo",
+      "language": "it",
+      "category": "emergency_real",
+      "difficulty": "easy",
+      "expected": {
+        "primary_vertical": "SOMATIC",
+        "v_mode": false,
+        "emergency": true,
+        "primary_horizontal": [
+          "H01_SURVIVAL",
+          "H03_BODY"
+        ]
+      },
+      "actual": {
+        "primary_vertical": "SOMATIC",
+        "v_mode_triggered": false,
+        "emergency_detected": true,
+        "vertical_scores": {
+          "SOMATIC": 1,
+          "FUNCTIONAL": 0,
+          "RELATIONAL": 0,
+          "EXISTENTIAL": 0,
+          "TRANSCENDENT": 0
+        },
+        "existential_score": 0,
+        "confidence": 0.08083316151184487,
+        "cross_dimensional": true
+      },
+      "pass": true,
+      "v_mode_correct": true,
+      "emergency_correct": true,
+      "vertical_correct": true
+    },
+    {
+      "case_id": "EMERG_REAL_02",
+      "input": "I think Im having a panic attack, I cant breathe",
+      "language": "en",
+      "category": "emergency_real",
+      "difficulty": "easy",
+      "expected": {
+        "primary_vertical": "SOMATIC",
+        "v_mode": false,
+        "emergency": true,
+        "primary_horizontal": [
+          "H01_SURVIVAL",
+          "H02_SAFETY"
+        ]
+      },
+      "actual": {
+        "primary_vertical": "SOMATIC",
+        "v_mode_triggered": false,
+        "emergency_detected": true,
+        "vertical_scores": {
+          "SOMATIC": 1,
+          "FUNCTIONAL": 0,
+          "RELATIONAL": 0,
+          "EXISTENTIAL": 0,
+          "TRANSCENDENT": 0
+        },
+        "existential_score": 0,
+        "confidence": 0.07921735347074589,
+        "cross_dimensional": true
+      },
+      "pass": true,
+      "v_mode_correct": true,
+      "emergency_correct": true,
+      "vertical_correct": true
+    },
+    {
+      "case_id": "EMERG_REAL_03",
+      "input": "Sto tremando e ho paura, non riesco a fermarmi",
+      "language": "it",
+      "category": "emergency_real",
+      "difficulty": "easy",
+      "expected": {
+        "primary_vertical": "SOMATIC",
+        "v_mode": false,
+        "emergency": true,
+        "primary_horizontal": [
+          "H02_SAFETY",
+          "H03_BODY"
+        ]
+      },
+      "actual": {
+        "primary_vertical": "SOMATIC",
+        "v_mode_triggered": false,
+        "emergency_detected": true,
+        "vertical_scores": {
+          "SOMATIC": 1,
+          "FUNCTIONAL": 0,
+          "RELATIONAL": 0,
+          "EXISTENTIAL": 0,
+          "TRANSCENDENT": 0
+        },
+        "existential_score": 0,
+        "confidence": 0.07921735347074589,
+        "cross_dimensional": true
+      },
+      "pass": true,
+      "v_mode_correct": true,
+      "emergency_correct": true,
+      "vertical_correct": true
+    },
+    {
+      "case_id": "EMERG_REAL_04",
+      "input": "Estoy muy asustado, mi corazón late muy rápido y sudo mucho",
+      "language": "es",
+      "category": "emergency_real",
+      "difficulty": "medium",
+      "expected": {
+        "primary_vertical": "SOMATIC",
+        "v_mode": false,
+        "emergency": true,
+        "primary_horizontal": [
+          "H02_SAFETY",
+          "H03_BODY"
+        ]
+      },
+      "actual": {
+        "primary_vertical": "SOMATIC",
+        "v_mode_triggered": false,
+        "emergency_detected": true,
+        "vertical_scores": {
+          "SOMATIC": 0.72,
+          "FUNCTIONAL": 0,
+          "RELATIONAL": 0,
+          "EXISTENTIAL": 0,
+          "TRANSCENDENT": 0
+        },
+        "existential_score": 0,
+        "confidence": 0.006899157490784264,
+        "cross_dimensional": false
+      },
+      "pass": true,
+      "v_mode_correct": true,
+      "emergency_correct": true,
+      "vertical_correct": true
+    },
+    {
+      "case_id": "EMERG_REAL_05",
+      "input": "Help me Im scared, something is very wrong",
+      "language": "en",
+      "category": "emergency_real",
+      "difficulty": "easy",
+      "expected": {
+        "primary_vertical": "SOMATIC",
+        "v_mode": false,
+        "emergency": true,
+        "primary_horizontal": [
+          "H01_SURVIVAL",
+          "H02_SAFETY"
+        ]
+      },
+      "actual": {
+        "primary_vertical": "SOMATIC",
+        "v_mode_triggered": false,
+        "emergency_detected": true,
+        "vertical_scores": {
+          "SOMATIC": 0.72,
+          "FUNCTIONAL": 0,
+          "RELATIONAL": 0,
+          "EXISTENTIAL": 0,
+          "TRANSCENDENT": 0
+        },
+        "existential_score": 0,
+        "confidence": 0.017514777802031797,
+        "cross_dimensional": true
+      },
+      "pass": true,
+      "v_mode_correct": true,
+      "emergency_correct": true,
+      "vertical_correct": true
+    },
+    {
+      "case_id": "EMERG_FP_01",
+      "input": "Mi batte il cuore per te",
+      "language": "it",
+      "category": "emergency_false_positive",
+      "difficulty": "medium",
+      "expected": {
+        "primary_vertical": "RELATIONAL",
+        "v_mode": false,
+        "emergency": false,
+        "primary_horizontal": [
+          "H09_ATTACHMENT"
+        ]
+      },
+      "actual": {
+        "primary_vertical": "SOMATIC",
+        "v_mode_triggered": false,
+        "emergency_detected": false,
+        "vertical_scores": {
+          "SOMATIC": 0.25,
+          "FUNCTIONAL": 0,
+          "RELATIONAL": 0,
+          "EXISTENTIAL": 0,
+          "TRANSCENDENT": 0
+        },
+        "existential_score": 0,
+        "confidence": 0,
+        "cross_dimensional": false
+      },
+      "pass": true,
+      "v_mode_correct": true,
+      "emergency_correct": true,
+      "vertical_correct": false,
+      "notes": "Romantic heart-racing, not panic"
+    },
+    {
+      "case_id": "EMERG_FP_02",
+      "input": "Sto morendo dal ridere",
+      "language": "it",
+      "category": "emergency_false_positive",
+      "difficulty": "medium",
+      "expected": {
+        "primary_vertical": "FUNCTIONAL",
+        "v_mode": false,
+        "emergency": false,
+        "primary_horizontal": [
+          "H04_EMOTION"
+        ]
+      },
+      "actual": {
+        "primary_vertical": "FUNCTIONAL",
+        "v_mode_triggered": false,
+        "emergency_detected": false,
+        "vertical_scores": {
+          "SOMATIC": 0,
+          "FUNCTIONAL": 0,
+          "RELATIONAL": 0,
+          "EXISTENTIAL": 0,
+          "TRANSCENDENT": 0
+        },
+        "existential_score": 0,
+        "confidence": 0,
+        "cross_dimensional": false
+      },
+      "pass": true,
+      "v_mode_correct": true,
+      "emergency_correct": true,
+      "vertical_correct": true,
+      "notes": "Italian idiom for laughing hard"
+    },
+    {
+      "case_id": "EMERG_FP_03",
+      "input": "This deadline is killing me",
+      "language": "en",
+      "category": "emergency_false_positive",
+      "difficulty": "medium",
+      "expected": {
+        "primary_vertical": "FUNCTIONAL",
+        "v_mode": false,
+        "emergency": false,
+        "primary_horizontal": [
+          "H14_WORK",
+          "H08_TEMPORAL"
+        ]
+      },
+      "actual": {
+        "primary_vertical": "FUNCTIONAL",
+        "v_mode_triggered": false,
+        "emergency_detected": false,
+        "vertical_scores": {
+          "SOMATIC": 0,
+          "FUNCTIONAL": 0,
+          "RELATIONAL": 0,
+          "EXISTENTIAL": 0,
+          "TRANSCENDENT": 0
+        },
+        "existential_score": 0,
+        "confidence": 0,
+        "cross_dimensional": false
+      },
+      "pass": true,
+      "v_mode_correct": true,
+      "emergency_correct": true,
+      "vertical_correct": true,
+      "notes": "Work stress metaphor"
+    },
+    {
+      "case_id": "EMERG_FP_04",
+      "input": "Ho paura di fare la scelta sbagliata",
+      "language": "it",
+      "category": "emergency_false_positive",
+      "difficulty": "hard",
+      "expected": {
+        "primary_vertical": "EXISTENTIAL",
+        "v_mode": true,
+        "emergency": false,
+        "primary_horizontal": [
+          "H05_COGNITION",
+          "H06_MEANING"
+        ]
+      },
+      "actual": {
+        "primary_vertical": "SOMATIC",
+        "v_mode_triggered": false,
+        "emergency_detected": false,
+        "vertical_scores": {
+          "SOMATIC": 0.72,
+          "FUNCTIONAL": 0,
+          "RELATIONAL": 0,
+          "EXISTENTIAL": 0.25,
+          "TRANSCENDENT": 0
+        },
+        "existential_score": 0.25,
+        "confidence": 0.05104002475322594,
+        "cross_dimensional": true
+      },
+      "pass": false,
+      "v_mode_correct": false,
+      "emergency_correct": true,
+      "vertical_correct": false,
+      "notes": "Fear of wrong choice is existential, not emergency"
+    },
+    {
+      "case_id": "EMERG_FP_05",
+      "input": "My heart races every time I see her",
+      "language": "en",
+      "category": "emergency_false_positive",
+      "difficulty": "medium",
+      "expected": {
+        "primary_vertical": "RELATIONAL",
+        "v_mode": false,
+        "emergency": false,
+        "primary_horizontal": [
+          "H09_ATTACHMENT"
+        ]
+      },
+      "actual": {
+        "primary_vertical": "SOMATIC",
+        "v_mode_triggered": false,
+        "emergency_detected": false,
+        "vertical_scores": {
+          "SOMATIC": 0.25,
+          "FUNCTIONAL": 0.25,
+          "RELATIONAL": 0,
+          "EXISTENTIAL": 0,
+          "TRANSCENDENT": 0
+        },
+        "existential_score": 0,
+        "confidence": 0.00636764159670849,
+        "cross_dimensional": true
+      },
+      "pass": true,
+      "v_mode_correct": true,
+      "emergency_correct": true,
+      "vertical_correct": false,
+      "notes": "Romantic excitement"
+    },
+    {
+      "case_id": "FUNC_01",
+      "input": "Whats the point of this meeting?",
+      "language": "en",
+      "category": "functional",
+      "difficulty": "hard",
+      "expected": {
+        "primary_vertical": "FUNCTIONAL",
+        "v_mode": false,
+        "emergency": false,
+        "primary_horizontal": [
+          "H14_WORK",
+          "H10_COORDINATION"
+        ]
+      },
+      "actual": {
+        "primary_vertical": "FUNCTIONAL",
+        "v_mode_triggered": false,
+        "emergency_detected": false,
+        "vertical_scores": {
+          "SOMATIC": 0,
+          "FUNCTIONAL": 0,
+          "RELATIONAL": 0,
+          "EXISTENTIAL": 0,
+          "TRANSCENDENT": 0
+        },
+        "existential_score": 0,
+        "confidence": 0,
+        "cross_dimensional": false
+      },
+      "pass": true,
+      "v_mode_correct": true,
+      "emergency_correct": true,
+      "vertical_correct": true,
+      "notes": "Work context - not existential despite \"point\""
+    },
+    {
+      "case_id": "FUNC_02",
+      "input": "Devo decidere entro domani se accettare il lavoro",
+      "language": "it",
+      "category": "functional",
+      "difficulty": "medium",
+      "expected": {
+        "primary_vertical": "FUNCTIONAL",
+        "v_mode": false,
+        "emergency": false,
+        "primary_horizontal": [
+          "H14_WORK",
+          "H05_COGNITION"
+        ]
+      },
+      "actual": {
+        "primary_vertical": "FUNCTIONAL",
+        "v_mode_triggered": false,
+        "emergency_detected": false,
+        "vertical_scores": {
+          "SOMATIC": 0,
+          "FUNCTIONAL": 1,
+          "RELATIONAL": 0,
+          "EXISTENTIAL": 0,
+          "TRANSCENDENT": 0
+        },
+        "existential_score": 0,
+        "confidence": 0.052464342081862084,
+        "cross_dimensional": true
+      },
+      "pass": true,
+      "v_mode_correct": true,
+      "emergency_correct": true,
+      "vertical_correct": true
+    },
+    {
+      "case_id": "FUNC_03",
+      "input": "How do I organize my tasks for the week?",
+      "language": "en",
+      "category": "functional",
+      "difficulty": "easy",
+      "expected": {
+        "primary_vertical": "FUNCTIONAL",
+        "v_mode": false,
+        "emergency": false,
+        "primary_horizontal": [
+          "H16_OPERATIONAL",
+          "H08_TEMPORAL"
+        ]
+      },
+      "actual": {
+        "primary_vertical": "FUNCTIONAL",
+        "v_mode_triggered": false,
+        "emergency_detected": false,
+        "vertical_scores": {
+          "SOMATIC": 0,
+          "FUNCTIONAL": 0.6,
+          "RELATIONAL": 0,
+          "EXISTENTIAL": 0,
+          "TRANSCENDENT": 0
+        },
+        "existential_score": 0,
+        "confidence": 0.004933575304913888,
+        "cross_dimensional": false
+      },
+      "pass": true,
+      "v_mode_correct": true,
+      "emergency_correct": true,
+      "vertical_correct": true
+    },
+    {
+      "case_id": "FUNC_04",
+      "input": "Il progetto è in ritardo, cosa faccio?",
+      "language": "it",
+      "category": "functional",
+      "difficulty": "easy",
+      "expected": {
+        "primary_vertical": "FUNCTIONAL",
+        "v_mode": false,
+        "emergency": false,
+        "primary_horizontal": [
+          "H14_WORK",
+          "H08_TEMPORAL"
+        ]
+      },
+      "actual": {
+        "primary_vertical": "FUNCTIONAL",
+        "v_mode_triggered": false,
+        "emergency_detected": false,
+        "vertical_scores": {
+          "SOMATIC": 0,
+          "FUNCTIONAL": 0,
+          "RELATIONAL": 0,
+          "EXISTENTIAL": 0,
+          "TRANSCENDENT": 0
+        },
+        "existential_score": 0,
+        "confidence": 0.001552390851355386,
+        "cross_dimensional": false
+      },
+      "pass": true,
+      "v_mode_correct": true,
+      "emergency_correct": true,
+      "vertical_correct": true
+    },
+    {
+      "case_id": "FUNC_05",
+      "input": "Tengo que terminar esto antes del viernes",
+      "language": "es",
+      "category": "functional",
+      "difficulty": "easy",
+      "expected": {
+        "primary_vertical": "FUNCTIONAL",
+        "v_mode": false,
+        "emergency": false,
+        "primary_horizontal": [
+          "H16_OPERATIONAL",
+          "H08_TEMPORAL"
+        ]
+      },
+      "actual": {
+        "primary_vertical": "FUNCTIONAL",
+        "v_mode_triggered": false,
+        "emergency_detected": false,
+        "vertical_scores": {
+          "SOMATIC": 0,
+          "FUNCTIONAL": 0,
+          "RELATIONAL": 0,
+          "EXISTENTIAL": 0,
+          "TRANSCENDENT": 0
+        },
+        "existential_score": 0,
+        "confidence": 0,
+        "cross_dimensional": false
+      },
+      "pass": true,
+      "v_mode_correct": true,
+      "emergency_correct": true,
+      "vertical_correct": true
+    },
+    {
+      "case_id": "REL_01",
+      "input": "Mia moglie non mi capisce più",
+      "language": "it",
+      "category": "relational",
+      "difficulty": "easy",
+      "expected": {
+        "primary_vertical": "RELATIONAL",
+        "v_mode": false,
+        "emergency": false,
+        "primary_horizontal": [
+          "H09_ATTACHMENT",
+          "H11_BELONGING"
+        ]
+      },
+      "actual": {
+        "primary_vertical": "FUNCTIONAL",
+        "v_mode_triggered": false,
+        "emergency_detected": false,
+        "vertical_scores": {
+          "SOMATIC": 0,
+          "FUNCTIONAL": 0,
+          "RELATIONAL": 0,
+          "EXISTENTIAL": 0,
+          "TRANSCENDENT": 0
+        },
+        "existential_score": 0,
+        "confidence": 0,
+        "cross_dimensional": false
+      },
+      "pass": true,
+      "v_mode_correct": true,
+      "emergency_correct": true,
+      "vertical_correct": false
+    },
+    {
+      "case_id": "REL_02",
+      "input": "I feel like Im losing my best friend",
+      "language": "en",
+      "category": "relational",
+      "difficulty": "easy",
+      "expected": {
+        "primary_vertical": "RELATIONAL",
+        "v_mode": false,
+        "emergency": false,
+        "primary_horizontal": [
+          "H09_ATTACHMENT"
+        ]
+      },
+      "actual": {
+        "primary_vertical": "SOMATIC",
+        "v_mode_triggered": false,
+        "emergency_detected": false,
+        "vertical_scores": {
+          "SOMATIC": 0.25,
+          "FUNCTIONAL": 0,
+          "RELATIONAL": 0.25,
+          "EXISTENTIAL": 0,
+          "TRANSCENDENT": 0
+        },
+        "existential_score": 0,
+        "confidence": 0,
+        "cross_dimensional": false
+      },
+      "pass": true,
+      "v_mode_correct": true,
+      "emergency_correct": true,
+      "vertical_correct": false
+    },
+    {
+      "case_id": "REL_03",
+      "input": "Non so se posso ancora fidarmi di lei",
+      "language": "it",
+      "category": "relational",
+      "difficulty": "easy",
+      "expected": {
+        "primary_vertical": "RELATIONAL",
+        "v_mode": false,
+        "emergency": false,
+        "primary_horizontal": [
+          "H09_ATTACHMENT"
+        ]
+      },
+      "actual": {
+        "primary_vertical": "FUNCTIONAL",
+        "v_mode_triggered": false,
+        "emergency_detected": false,
+        "vertical_scores": {
+          "SOMATIC": 0,
+          "FUNCTIONAL": 0,
+          "RELATIONAL": 0,
+          "EXISTENTIAL": 0,
+          "TRANSCENDENT": 0
+        },
+        "existential_score": 0,
+        "confidence": 0,
+        "cross_dimensional": false
+      },
+      "pass": true,
+      "v_mode_correct": true,
+      "emergency_correct": true,
+      "vertical_correct": false
+    },
+    {
+      "case_id": "REL_04",
+      "input": "My parents dont understand what Im going through",
+      "language": "en",
+      "category": "relational",
+      "difficulty": "easy",
+      "expected": {
+        "primary_vertical": "RELATIONAL",
+        "v_mode": false,
+        "emergency": false,
+        "primary_horizontal": [
+          "H09_ATTACHMENT",
+          "H11_BELONGING"
+        ]
+      },
+      "actual": {
+        "primary_vertical": "RELATIONAL",
+        "v_mode_triggered": false,
+        "emergency_detected": false,
+        "vertical_scores": {
+          "SOMATIC": 0,
+          "FUNCTIONAL": 0,
+          "RELATIONAL": 0.25,
+          "EXISTENTIAL": 0,
+          "TRANSCENDENT": 0
+        },
+        "existential_score": 0,
+        "confidence": 0.001757187130493007,
+        "cross_dimensional": false
+      },
+      "pass": true,
+      "v_mode_correct": true,
+      "emergency_correct": true,
+      "vertical_correct": true
+    },
+    {
+      "case_id": "REL_05",
+      "input": "Mi sento solo anche quando sono in mezzo agli altri",
+      "language": "it",
+      "category": "relational",
+      "difficulty": "medium",
+      "expected": {
+        "primary_vertical": "RELATIONAL",
+        "v_mode": false,
+        "emergency": false,
+        "primary_horizontal": [
+          "H11_BELONGING",
+          "H09_ATTACHMENT"
+        ]
+      },
+      "actual": {
+        "primary_vertical": "RELATIONAL",
+        "v_mode_triggered": false,
+        "emergency_detected": false,
+        "vertical_scores": {
+          "SOMATIC": 0,
+          "FUNCTIONAL": 0,
+          "RELATIONAL": 0.25,
+          "EXISTENTIAL": 0.25,
+          "TRANSCENDENT": 0
+        },
+        "existential_score": 0.25,
+        "confidence": 0,
+        "cross_dimensional": false
+      },
+      "pass": true,
+      "v_mode_correct": true,
+      "emergency_correct": true,
+      "vertical_correct": true,
+      "notes": "Loneliness is relational, not necessarily existential"
+    },
+    {
+      "case_id": "EDGE_01",
+      "input": "Non so, I just feel confused about everything",
+      "language": "en",
+      "category": "edge_case",
+      "difficulty": "hard",
+      "expected": {
+        "primary_vertical": "EXISTENTIAL",
+        "v_mode": true,
+        "emergency": false,
+        "primary_horizontal": [
+          "H06_MEANING",
+          "H07_IDENTITY"
+        ]
+      },
+      "actual": {
+        "primary_vertical": "SOMATIC",
+        "v_mode_triggered": false,
+        "emergency_detected": false,
+        "vertical_scores": {
+          "SOMATIC": 0.25,
+          "FUNCTIONAL": 0,
+          "RELATIONAL": 0,
+          "EXISTENTIAL": 0,
+          "TRANSCENDENT": 0
+        },
+        "existential_score": 0,
+        "confidence": 0.006008624999129611,
+        "cross_dimensional": true
+      },
+      "pass": false,
+      "v_mode_correct": false,
+      "emergency_correct": true,
+      "vertical_correct": false,
+      "notes": "Code-switching Italian/English"
+    },
+    {
+      "case_id": "EDGE_02",
+      "input": "wtf is even the point lol",
+      "language": "en",
+      "category": "edge_case",
+      "difficulty": "hard",
+      "expected": {
+        "primary_vertical": "EXISTENTIAL",
+        "v_mode": true,
+        "emergency": false,
+        "primary_horizontal": [
+          "H06_MEANING"
+        ]
+      },
+      "actual": {
+        "primary_vertical": "FUNCTIONAL",
+        "v_mode_triggered": false,
+        "emergency_detected": false,
+        "vertical_scores": {
+          "SOMATIC": 0,
+          "FUNCTIONAL": 0,
+          "RELATIONAL": 0,
+          "EXISTENTIAL": 0,
+          "TRANSCENDENT": 0
+        },
+        "existential_score": 0,
+        "confidence": 0,
+        "cross_dimensional": false
+      },
+      "pass": false,
+      "v_mode_correct": false,
+      "emergency_correct": true,
+      "vertical_correct": false,
+      "notes": "Casual/slang existential"
+    },
+    {
+      "case_id": "EDGE_03",
+      "input": "Boh, non so che dire",
+      "language": "it",
+      "category": "edge_case",
+      "difficulty": "medium",
+      "expected": {
+        "primary_vertical": "FUNCTIONAL",
+        "v_mode": false,
+        "emergency": false,
+        "primary_horizontal": [
+          "H05_COGNITION"
+        ]
+      },
+      "actual": {
+        "primary_vertical": "FUNCTIONAL",
+        "v_mode_triggered": false,
+        "emergency_detected": false,
+        "vertical_scores": {
+          "SOMATIC": 0,
+          "FUNCTIONAL": 0,
+          "RELATIONAL": 0,
+          "EXISTENTIAL": 0,
+          "TRANSCENDENT": 0
+        },
+        "existential_score": 0,
+        "confidence": 0,
+        "cross_dimensional": false
+      },
+      "pass": true,
+      "v_mode_correct": true,
+      "emergency_correct": true,
+      "vertical_correct": true,
+      "notes": "Italian filler - not existential"
+    },
+    {
+      "case_id": "EDGE_04",
+      "input": "...",
+      "language": "en",
+      "category": "edge_case",
+      "difficulty": "hard",
+      "expected": {
+        "primary_vertical": "FUNCTIONAL",
+        "v_mode": false,
+        "emergency": false,
+        "primary_horizontal": []
+      },
+      "actual": {
+        "primary_vertical": "FUNCTIONAL",
+        "v_mode_triggered": false,
+        "emergency_detected": false,
+        "vertical_scores": {
+          "SOMATIC": 0,
+          "FUNCTIONAL": 0,
+          "RELATIONAL": 0,
+          "EXISTENTIAL": 0,
+          "TRANSCENDENT": 0
+        },
+        "existential_score": 0,
+        "confidence": 0,
+        "cross_dimensional": false
+      },
+      "pass": true,
+      "v_mode_correct": true,
+      "emergency_correct": true,
+      "vertical_correct": true,
+      "notes": "Silence/ellipsis - should not trigger"
+    },
+    {
+      "case_id": "EDGE_05",
+      "input": "K",
+      "language": "en",
+      "category": "edge_case",
+      "difficulty": "easy",
+      "expected": {
+        "primary_vertical": "FUNCTIONAL",
+        "v_mode": false,
+        "emergency": false,
+        "primary_horizontal": []
+      },
+      "actual": {
+        "primary_vertical": "FUNCTIONAL",
+        "v_mode_triggered": false,
+        "emergency_detected": false,
+        "vertical_scores": {
+          "SOMATIC": 0,
+          "FUNCTIONAL": 0,
+          "RELATIONAL": 0,
+          "EXISTENTIAL": 0,
+          "TRANSCENDENT": 0
+        },
+        "existential_score": 0,
+        "confidence": 0,
+        "cross_dimensional": false
+      },
+      "pass": true,
+      "v_mode_correct": true,
+      "emergency_correct": true,
+      "vertical_correct": true,
+      "notes": "Minimal response"
+    },
+    {
+      "case_id": "AMB_01",
+      "input": "Non ce la faccio più",
+      "language": "it",
+      "category": "ambiguous",
+      "difficulty": "hard",
+      "expected": {
+        "primary_vertical": "EXISTENTIAL",
+        "v_mode": true,
+        "emergency": false,
+        "primary_horizontal": [
+          "H06_MEANING",
+          "H04_EMOTION"
+        ]
+      },
+      "actual": {
+        "primary_vertical": "FUNCTIONAL",
+        "v_mode_triggered": false,
+        "emergency_detected": false,
+        "vertical_scores": {
+          "SOMATIC": 0,
+          "FUNCTIONAL": 0,
+          "RELATIONAL": 0,
+          "EXISTENTIAL": 0,
+          "TRANSCENDENT": 0
+        },
+        "existential_score": 0,
+        "confidence": 0,
+        "cross_dimensional": false
+      },
+      "pass": false,
+      "v_mode_correct": false,
+      "emergency_correct": true,
+      "vertical_correct": false,
+      "notes": "Could be burnout, crisis, or just frustration"
+    },
+    {
+      "case_id": "AMB_02",
+      "input": "I cant do this anymore",
+      "language": "en",
+      "category": "ambiguous",
+      "difficulty": "hard",
+      "expected": {
+        "primary_vertical": "EXISTENTIAL",
+        "v_mode": true,
+        "emergency": false,
+        "primary_horizontal": [
+          "H06_MEANING",
+          "H04_EMOTION"
+        ]
+      },
+      "actual": {
+        "primary_vertical": "FUNCTIONAL",
+        "v_mode_triggered": false,
+        "emergency_detected": false,
+        "vertical_scores": {
+          "SOMATIC": 0,
+          "FUNCTIONAL": 0,
+          "RELATIONAL": 0,
+          "EXISTENTIAL": 0,
+          "TRANSCENDENT": 0
+        },
+        "existential_score": 0,
+        "confidence": 0,
+        "cross_dimensional": false
+      },
+      "pass": false,
+      "v_mode_correct": false,
+      "emergency_correct": true,
+      "vertical_correct": false,
+      "notes": "Need context - work frustration or existential crisis?"
+    },
+    {
+      "case_id": "AMB_03",
+      "input": "Non vedo via duscita",
+      "language": "it",
+      "category": "ambiguous",
+      "difficulty": "hard",
+      "expected": {
+        "primary_vertical": "EXISTENTIAL",
+        "v_mode": true,
+        "emergency": false,
+        "primary_horizontal": [
+          "H06_MEANING"
+        ]
+      },
+      "actual": {
+        "primary_vertical": "FUNCTIONAL",
+        "v_mode_triggered": false,
+        "emergency_detected": false,
+        "vertical_scores": {
+          "SOMATIC": 0,
+          "FUNCTIONAL": 0,
+          "RELATIONAL": 0,
+          "EXISTENTIAL": 0,
+          "TRANSCENDENT": 0
+        },
+        "existential_score": 0,
+        "confidence": 0,
+        "cross_dimensional": false
+      },
+      "pass": false,
+      "v_mode_correct": false,
+      "emergency_correct": true,
+      "vertical_correct": false,
+      "notes": "No way out - could be problem-solving or despair"
+    },
+    {
+      "case_id": "AMB_04",
+      "input": "Everything is falling apart",
+      "language": "en",
+      "category": "ambiguous",
+      "difficulty": "hard",
+      "expected": {
+        "primary_vertical": "EXISTENTIAL",
+        "v_mode": true,
+        "emergency": false,
+        "primary_horizontal": [
+          "H06_MEANING",
+          "H04_EMOTION"
+        ]
+      },
+      "actual": {
+        "primary_vertical": "FUNCTIONAL",
+        "v_mode_triggered": false,
+        "emergency_detected": false,
+        "vertical_scores": {
+          "SOMATIC": 0,
+          "FUNCTIONAL": 0,
+          "RELATIONAL": 0,
+          "EXISTENTIAL": 0,
+          "TRANSCENDENT": 0
+        },
+        "existential_score": 0,
+        "confidence": 0,
+        "cross_dimensional": false
+      },
+      "pass": false,
+      "v_mode_correct": false,
+      "emergency_correct": true,
+      "vertical_correct": false,
+      "notes": "Catastrophizing or genuine crisis?"
+    },
+    {
+      "case_id": "AMB_05",
+      "input": "Sono bloccato",
+      "language": "it",
+      "category": "ambiguous",
+      "difficulty": "hard",
+      "expected": {
+        "primary_vertical": "FUNCTIONAL",
+        "v_mode": false,
+        "emergency": false,
+        "primary_horizontal": [
+          "H05_COGNITION",
+          "H16_OPERATIONAL"
+        ]
+      },
+      "actual": {
+        "primary_vertical": "FUNCTIONAL",
+        "v_mode_triggered": false,
+        "emergency_detected": false,
+        "vertical_scores": {
+          "SOMATIC": 0,
+          "FUNCTIONAL": 0,
+          "RELATIONAL": 0,
+          "EXISTENTIAL": 0,
+          "TRANSCENDENT": 0
+        },
+        "existential_score": 0,
+        "confidence": 0,
+        "cross_dimensional": false
+      },
+      "pass": true,
+      "v_mode_correct": true,
+      "emergency_correct": true,
+      "vertical_correct": true,
+      "notes": "Stuck on task or stuck in life?"
+    }
+  ],
+  "failures": {
+    "existential_clear": [
+      "EX_CLEAR_03",
+      "EX_CLEAR_05",
+      "EX_CLEAR_07",
+      "EX_CLEAR_08",
+      "EX_CLEAR_09",
+      "EX_CLEAR_10"
+    ],
+    "existential_subtle": [
+      "EX_SUBTLE_01",
+      "EX_SUBTLE_02",
+      "EX_SUBTLE_03",
+      "EX_SUBTLE_04",
+      "EX_SUBTLE_05",
+      "EX_SUBTLE_06",
+      "EX_SUBTLE_07",
+      "EX_SUBTLE_08",
+      "EX_SUBTLE_09",
+      "EX_SUBTLE_10"
+    ],
+    "emergency_real": [],
+    "emergency_false_positive": [
+      "EMERG_FP_04"
+    ],
+    "functional": [],
+    "relational": [],
+    "edge_case": [
+      "EDGE_01",
+      "EDGE_02"
+    ],
+    "ambiguous": [
+      "AMB_01",
+      "AMB_02",
+      "AMB_03",
+      "AMB_04"
+    ]
+  }
+}
