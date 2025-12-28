@@ -4,9 +4,10 @@
 
 > *Sistema Operativo Totale per l'Esistenza Umana*
 
-[![Release](https://img.shields.io/badge/release-v2.5.0-blue)](https://github.com/rossignoliluca/ENOQ-CORE/releases/tag/v2.5.0)
-[![Tests](https://img.shields.io/badge/tests-363%20passing-green)](https://github.com/rossignoliluca/ENOQ-CORE)
+[![Release](https://img.shields.io/badge/release-v2.5.1-blue)](https://github.com/rossignoliluca/ENOQ-CORE/releases/tag/v2.5.1)
+[![Tests](https://img.shields.io/badge/tests-396%20passing-green)](https://github.com/rossignoliluca/ENOQ-CORE)
 [![Stochastic](https://img.shields.io/badge/dynamics-Langevin%20%2B%20O--U-purple)](https://github.com/rossignoliluca/ENOQ-CORE)
+[![Curvature](https://img.shields.io/badge/feedback-field%20→%20selection-orange)](https://github.com/rossignoliluca/ENOQ-CORE)
 [![Persistence](https://img.shields.io/badge/memory-regulatory--only-blue)](https://github.com/rossignoliluca/ENOQ-CORE)
 [![Gate](https://img.shields.io/badge/gate-0.1ms%20embedded-blue)](https://github.com/rossignoliluca/ENOQ-CORE)
 [![Accuracy](https://img.shields.io/badge/detector-100%25%20accuracy-brightgreen)](https://github.com/rossignoliluca/ENOQ-CORE)
@@ -65,7 +66,9 @@ DOMAIN GOVERNOR (coexistence rules)
     ↓
 L1 FIELD COMPILER (perception → constraints)
     ↓
-L1.5 STOCHASTIC FIELD (Langevin + O-U dynamics)    ← NEW v2.5
+L1.5 STOCHASTIC FIELD (Langevin + O-U dynamics)
+    ↓
+S3 SELECTION CURVER (field → selection feedback)    ← NEW v2.5.1
     ↓
 L2 EXECUTION (multi-domain, blind)
     ↓
@@ -190,6 +193,31 @@ dq = -∇U dt/(1+γ) + √(2D) dB_H
 | EXISTENTIAL | High existential load | V_MODE activation |
 | EMERGENCY | Somatic threshold exceeded | Absorbing → Ground state |
 
+### Selection Curver (v2.5.1)
+Closes the feedback loop: **field evolves → selection curves → response adapts**.
+
+The stochastic field's thermodynamic quantities directly modify selection constraints:
+
+**Curvature Mappings:**
+| Source | Threshold | Effect |
+|--------|-----------|--------|
+| Regime EMERGENCY | — | Force surface + grounding |
+| Regime EXISTENTIAL | — | Activate V_MODE + ownership return |
+| Regime CRITICAL | — | Reduce depth by 1 level |
+| U_total | > 4.0 | Force surface (critical barrier) |
+| U_total | > 2.0 | Reduce depth (high barrier) |
+| d_identity | < 0.1 | V_MODE + maximum restriction (at Rubicon) |
+| d_identity | < 0.2 | V_MODE activation (near Rubicon) |
+| F (free energy) | < -0.5 | Stable equilibrium, allow deeper |
+| F (free energy) | > 1.0 | Unstable, reduce depth |
+| S (entropy) | > 2.0 | Disorder, require grounding |
+| S (entropy) | > 1.5 | Allow exploration |
+| T (temperature) | > 0.9 | Critical, force surface + slow |
+| ε (epsilon) | < 0.3 | Low intervention capacity, force surface |
+| γ (gamma) | > 0.5 | High dissipation, minimal length |
+
+**Precedence:** V_MODE and EMERGENCY atmospheres from stochastic/dimensional detection take priority over Governor and Gate overrides.
+
 ---
 
 ## Key Files
@@ -213,6 +241,7 @@ dq = -∇U dt/(1+γ) + √(2D) dB_H
 | `src/gate_embedded.ts` | L0 boundary marker | 54/54 |
 | `src/perception.ts` | Domain/arousal detection | 13/13 |
 | `src/stochastic_field.ts` | Langevin + O-U dynamics | 45/45 |
+| `src/selection_curver.ts` | Field → Selection feedback | 33/33 |
 | `src/selection.ts` | Mode/atmosphere routing | Built-in |
 | `src/domain_governor.ts` | Coexistence rules | Built-in |
 | `src/meta_kernel.ts` | Power governance | 14/14 |
@@ -247,6 +276,7 @@ npx ts-node src/__tests__/ultimate_benchmark.ts
 
 ```bash
 npx jest stochastic_field            # Langevin + O-U dynamics
+npx jest selection_curver            # Field → Selection feedback
 npx jest concrescence_integration    # Full integration
 npx jest dimensional_detection       # V_MODE + Emergency
 npx jest constitutional_components   # AXIS + Dissipation
@@ -283,6 +313,12 @@ Stochastic Field (L1.5):
   - T=0.42, ε=0.95, γ=0.03
   - U_total=2.8, F=1.9, S=1.1
   - d_identity=0.35 (approaching Rubicon)
+
+Selection Curver (S3.55):
+  - Curvature severity: 70%
+  - Applied: EXISTENTIAL regime → V_MODE + ownership return
+  - Applied: High U_total → reduced depth
+  - Atmosphere: V_MODE (preserved, takes precedence)
 
 L2 ExecutionContext:
   - Runtime: L2_DEEP
@@ -329,6 +365,7 @@ Core templates exist in EN, IT, ES, FR, DE with fallback support.
 | Component | Status | Score |
 |-----------|--------|-------|
 | Stochastic Field | ✅ Production | **45/45 tests**, Langevin + O-U |
+| Selection Curver | ✅ Production | **33/33 tests**, field → selection |
 | Gate Embedded | ✅ Production | **<0.2ms** latency, 54 tests |
 | Ultimate Detector | ✅ Production | **100% accuracy** (27/27) |
 | ConcrescenceEngine | ✅ Complete | Unified entry point |
@@ -339,7 +376,7 @@ Core templates exist in EN, IT, ES, FR, DE with fallback support.
 | MetaKernel | ✅ Complete | 10/10 |
 | L2 Execution | ✅ Complete | 10/10 |
 | S5 Verify | ✅ Complete | 10/10 |
-| Test Suite | ✅ Passing | **363 tests** |
+| Test Suite | ✅ Passing | **396 tests** |
 
 ---
 
