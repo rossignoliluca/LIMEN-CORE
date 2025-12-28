@@ -29,12 +29,27 @@ import {
   CandidateSuggestion,
   PolicyAdjustments,
   DelegationPrediction,
+  PolicyAdjustmentTrace,
+  mergePolicyAdjustments,
   DEADLINE_CONFIG,
   waitForSignals,
   mergeSignals,
   CONSERVATIVE_DEFAULTS,
 } from './early_signals';
 import { ADSScore, MotiveDistribution, RiskFlags } from './response_plan';
+
+// Import ADS detector
+import { computeADS, ADSInput, ADSResult } from './ads_detector';
+
+// Import Second Order Observer
+import {
+  observeSecondOrder,
+  toPartialPolicy,
+  shouldSetEnchantmentFlag,
+  SecondOrderInput,
+  SecondOrderResult,
+  SecondOrderDetection,
+} from './second_order_observer';
 
 // Import TotalSystem components
 import { memorySystem } from './memory_system';
@@ -43,6 +58,9 @@ import { metacognitiveMonitor } from './metacognitive_monitor';
 import { temporalEngine } from './temporal_engine';
 import { disciplinesSynthesis } from './disciplines_synthesis';
 import { dissipationEngine } from './dissipation';
+
+// Import LLM detector v2 (regime classification)
+import { llmDetectorV2, LLMDetectorSignals, ExistentialSpecificity } from './llm_detector_v2';
 
 // ============================================
 // BRIDGE INPUT
@@ -55,6 +73,21 @@ export interface BridgeInput {
   field_state: FieldState;
   dimensional_state: DimensionalState;
   session_id?: string;
+
+  /** Profile controls which contributors run */
+  profile?: 'minimal' | 'standard' | 'full';
+
+  /** Recent system responses for Second Order Observer (last 3-6) */
+  recent_system_responses?: string[];
+
+  /** Session history for ADS inertia computation */
+  session_history?: {
+    delegation_count: number;
+    same_topic_count: number;
+    intervention_count: number;
+    last_intervention_turn?: number;
+    current_turn?: number;
+  };
 }
 
 // ============================================
@@ -329,72 +362,71 @@ export function extractPolicyAdjustments(): PolicyAdjustments | undefined {
 }
 
 /**
- * Extract DelegationPrediction (ADS + motive).
- * This is a placeholder - would need full ADS implementation.
+ * Extract DelegationPrediction using ADS detector.
+ *
+ * Returns:
+ * - DelegationPrediction with ADS score
+ * - HARD policy adjustments (disable_tools, must_require_user_effort, brevity_delta)
  */
 export function extractDelegationPrediction(
   message: string,
   dimensionalState: DimensionalState,
-  fieldState: FieldState
-): DelegationPrediction | undefined {
+  fieldState: FieldState,
+  sessionHistory?: {
+    delegation_count: number;
+    same_topic_count: number;
+    intervention_count: number;
+    last_intervention_turn?: number;
+    current_turn?: number;
+  }
+): { prediction: DelegationPrediction; policy: Partial<PolicyAdjustments>; reasoning: string } | undefined {
   try {
-    // Simple heuristic ADS (placeholder for real implementation)
-    const delegationMarkers = [
-      'should i', 'what should', 'tell me what',
-      'dovrei', 'cosa dovrei', 'dimmi cosa',
-      'debería', 'qué debería', 'dime qué',
-    ];
-
-    const hasDelegation = delegationMarkers.some(m =>
-      message.toLowerCase().includes(m)
-    );
-
-    const isVMode = dimensionalState.v_mode_triggered;
-
-    // Estimate ability (can they do it themselves?)
-    const ability = isVMode ? 0.9 : 0.5;  // V_MODE = yes they can
-
-    // Estimate state (are they in state to do it?)
-    const state = dimensionalState.emergency_detected ? 0.2 : 0.7;
-
-    // Avoidability
-    const avoidability = (ability + state) / 2;
-
-    // Simple motive distribution (placeholder)
-    const motive: MotiveDistribution = {
-      genuine_incapacity: dimensionalState.emergency_detected ? 0.6 : 0.1,
-      time_saving_tooling: fieldState.goal === 'inform' ? 0.4 : 0.1,
-      time_saving_substitution: 0.1,
-      emotional_offload: isVMode ? 0.3 : 0.1,
-      decision_avoidance: hasDelegation && isVMode ? 0.5 : 0.1,
-      validation_seeking: 0.1,
-      habit: 0.1,
+    const adsInput: ADSInput = {
+      message,
+      dimensionalState,
+      fieldState,
+      sessionHistory,
     };
 
-    // Weight by problematic motives
-    const motiveWeight =
-      motive.time_saving_substitution * 0.8 +
-      motive.emotional_offload * 0.6 +
-      motive.decision_avoidance * 0.9 +
-      motive.validation_seeking * 0.4 +
-      motive.habit * 0.5;
-
-    // Inertia (would come from session history)
-    const inertia = 1.0;  // Placeholder
-
-    const ads: ADSScore = {
-      score: avoidability * motiveWeight,
-      avoidability: { ability, state },
-      motive_weight: motiveWeight,
-      inertia,
-      final: avoidability * motiveWeight * inertia,
-    };
+    const result = computeADS(adsInput);
 
     return {
-      ads,
-      motive,
-      should_intervene: ads.final > 0.5,
-      intervention_level: Math.min(1, ads.final * 1.5),
+      prediction: result.prediction,
+      policy: result.policy,
+      reasoning: result.reasoning,
+    };
+  } catch {
+    return undefined;
+  }
+}
+
+/**
+ * Extract Second Order Observer signals.
+ *
+ * Returns:
+ * - SOFT policy adjustments only (warmth_delta, force_pronouns, brevity_delta)
+ * - Detection scores for debugging
+ * - Enchantment flag determination
+ */
+export function extractSecondOrderSignals(
+  message: string,
+  recentSystemResponses: string[],
+  loopCount: number
+): { policy: Partial<PolicyAdjustments>; detection: SecondOrderDetection; reasoning: string; enchantmentFlag: boolean } | undefined {
+  try {
+    const input: SecondOrderInput = {
+      message,
+      recent_system_responses: recentSystemResponses,
+      loop_count: loopCount,
+    };
+
+    const result = observeSecondOrder(input);
+
+    return {
+      policy: toPartialPolicy(result.policy),
+      detection: result.detection,
+      reasoning: result.reasoning,
+      enchantmentFlag: shouldSetEnchantmentFlag(result.detection),
     };
   } catch {
     return undefined;
@@ -420,19 +452,148 @@ export function extractRiskFlags(
 }
 
 // ============================================
+// LLM DETECTOR CONTRIBUTOR
+// ============================================
+
+/**
+ * LLM detector contribution result.
+ * Used to merge with other signals.
+ */
+export interface LLMDetectorContribution {
+  signals: LLMDetectorSignals | null;
+  used: boolean;
+  reason: string;
+}
+
+/**
+ * Extract signals from LLM detector v2.
+ * Only runs in 'full' profile.
+ *
+ * Key principle: LLM detector contributes v_mode and existential_specificity,
+ * but does NOT override emergency detection (regex is good at that).
+ */
+export async function extractLLMDetectorSignals(
+  message: string,
+  language: SupportedLanguage,
+  profile: 'minimal' | 'standard' | 'full'
+): Promise<LLMDetectorContribution> {
+  // Only run in 'full' profile
+  if (profile !== 'full') {
+    return {
+      signals: null,
+      used: false,
+      reason: `LLM detector skipped (profile=${profile})`,
+    };
+  }
+
+  try {
+    const signals = await llmDetectorV2.contribute(message, language);
+    return {
+      signals,
+      used: signals.llm_detector_called,
+      reason: signals.llm_detector_reason,
+    };
+  } catch (error) {
+    return {
+      signals: null,
+      used: false,
+      reason: `LLM detector error: ${error}`,
+    };
+  }
+}
+
+/** Minimum confidence for LLM to override regex */
+const LLM_CONFIDENCE_THRESHOLD = 0.65;
+
+/**
+ * Merge LLM detector signals with base risk flags.
+ *
+ * RULE: LLM overrides regex ONLY if LLM is confident (>= threshold).
+ * If LLM is uncertain, use "OR" logic (either trigger = trigger).
+ * Emergency detection stays with regex (already good at it).
+ */
+export function mergeWithLLMDetector(
+  baseFlags: Partial<RiskFlags>,
+  llmSignals: LLMDetectorSignals | null
+): Partial<RiskFlags> {
+  if (!llmSignals) {
+    return baseFlags;
+  }
+
+  // LLM confidence = 1 - uncertainty
+  const llmConfidence = 1 - (llmSignals.metacognitive?.uncertainty ?? 0.5);
+  const llmIsConfident = llmConfidence >= LLM_CONFIDENCE_THRESHOLD;
+
+  // Determine v_mode merge strategy
+  let v_mode: boolean;
+  if (llmIsConfident) {
+    // LLM is confident → trust LLM
+    v_mode = llmSignals.risk_flags?.v_mode ?? baseFlags.v_mode ?? false;
+  } else {
+    // LLM is uncertain → OR logic (either trigger = trigger)
+    v_mode = (llmSignals.risk_flags?.v_mode ?? false) || (baseFlags.v_mode ?? false);
+  }
+
+  // Same logic for boundary_approach
+  let boundary_approach: boolean;
+  if (llmIsConfident) {
+    boundary_approach = llmSignals.risk_flags?.boundary_approach ?? baseFlags.boundary_approach ?? false;
+  } else {
+    boundary_approach = (llmSignals.risk_flags?.boundary_approach ?? false) ||
+                        (baseFlags.boundary_approach ?? false);
+  }
+
+  return {
+    ...baseFlags,
+    v_mode,
+    boundary_approach,
+    // Emergency stays with regex (already good at it)
+    // emergency: baseFlags.emergency (unchanged)
+    // crisis: baseFlags.crisis (unchanged)
+  };
+}
+
+// ============================================
 // MAIN BRIDGE FUNCTION
 // ============================================
+
+/**
+ * Extended EarlySignals with LLM detector and policy trace metadata.
+ */
+export interface ExtendedEarlySignals extends EarlySignals {
+  /** Existential content detected (primitive) */
+  existential_content?: boolean;
+
+  /** Existential specificity breakdown */
+  existential_specificity?: ExistentialSpecificity;
+
+  /** LLM detector debug info */
+  llm_detector?: {
+    called: boolean;
+    reason: string;
+    timeout: boolean;
+  };
+
+  /** Policy adjustment trace (for debugging) */
+  policy_trace?: PolicyAdjustmentTrace;
+
+  /** Second Order Observer detection scores */
+  second_order_detection?: SecondOrderDetection;
+}
 
 /**
  * Generate EarlySignals from TotalSystem components.
  * Runs all extractors in parallel, merges results.
  * Each extractor can fail independently without blocking.
+ *
+ * profile='full' enables LLM detector for improved v_mode detection.
  */
 export async function generateEarlySignals(
   input: BridgeInput
-): Promise<EarlySignals> {
+): Promise<ExtendedEarlySignals> {
   const startTime = Date.now();
   const contributors: string[] = [];
+  const profile = input.profile || 'standard';
 
   // Run extractors in parallel (they can fail independently)
   const [
@@ -441,8 +602,10 @@ export async function generateEarlySignals(
     metacognitiveSignal,
     temporalSignal,
     candidateSuggestions,
-    policyAdjustments,
-    delegationPred,
+    basePolicyAdjustments,
+    adsResult,
+    secondOrderResult,
+    llmContribution,
   ] = await Promise.all([
     // Memory (fast, sync)
     Promise.resolve(extractMemoryPrior(input.user_id)).then(r => {
@@ -489,41 +652,133 @@ export async function generateEarlySignals(
       return r;
     }),
 
-    // Policy adjustments (sync)
+    // Base policy adjustments from dissipation (sync)
     Promise.resolve(extractPolicyAdjustments()).then(r => {
       if (r) contributors.push('dissipation');
       return r;
     }),
 
-    // Delegation prediction (sync)
+    // ADS: Delegation prediction + HARD policy (sync)
     Promise.resolve(extractDelegationPrediction(
       input.message,
       input.dimensional_state,
-      input.field_state
+      input.field_state,
+      input.session_history
     )).then(r => {
       if (r) contributors.push('ads');
       return r;
     }),
+
+    // Second Order Observer: SOFT policy (sync)
+    Promise.resolve(extractSecondOrderSignals(
+      input.message,
+      input.recent_system_responses || [],
+      input.field_state.loop_count
+    )).then(r => {
+      if (r) contributors.push('second_order');
+      return r;
+    }),
+
+    // LLM detector v2 (only in 'full' profile)
+    extractLLMDetectorSignals(input.message, input.language, profile)
+      .then(r => {
+        if (r.used) contributors.push('llm_detector_v2');
+        return r;
+      })
+      .catch((error) => ({
+        signals: null,
+        used: false,
+        reason: `LLM detector error: ${error}`,
+      })),
   ]);
 
-  // Extract risk flags
-  const riskFlags = extractRiskFlags(input.dimensional_state, input.field_state);
+  // ---- MERGE POLICY ADJUSTMENTS ----
+  // Order: Base → ADS (HARD) → Second Order (SOFT)
+  // Rule: min for brevity, OR for disable_tools/must_require_user_effort, sum for warmth
+  const adsPolicy = adsResult?.policy ?? {};
+  const secondOrderPolicy = secondOrderResult?.policy ?? {};
+
+  // Start with base policy
+  let mergedPolicy = basePolicyAdjustments ?? {};
+
+  // Merge ADS policy (HARD constraints)
+  mergedPolicy = mergePolicyAdjustments(mergedPolicy, adsPolicy);
+
+  // Merge Second Order policy (SOFT constraints)
+  mergedPolicy = mergePolicyAdjustments(mergedPolicy, secondOrderPolicy);
+
+  // Build policy trace for debugging
+  const policyTrace: PolicyAdjustmentTrace = {
+    ads_policy: adsPolicy,
+    second_order_policy: secondOrderPolicy,
+    merged_policy: mergedPolicy,
+    ads_reasoning: adsResult?.reasoning,
+    second_order_reasoning: secondOrderResult?.reasoning,
+  };
+
+  // Debug log policy trace
+  if (process.env.ENOQ_DEBUG) {
+    console.log('[Bridge] ADS:', JSON.stringify(adsPolicy));
+    console.log('[Bridge] Second Order:', JSON.stringify(secondOrderPolicy));
+    console.log('[Bridge] Merged Policy:', JSON.stringify(mergedPolicy));
+  }
+
+  // Extract base risk flags from regex
+  const baseRiskFlags = extractRiskFlags(input.dimensional_state, input.field_state);
   contributors.push('risk');
+
+  // Merge with LLM detector signals (LLM has priority for v_mode)
+  let riskFlags = mergeWithLLMDetector(baseRiskFlags, llmContribution.signals);
+
+  // Add enchantment flag from Second Order Observer
+  if (secondOrderResult?.enchantmentFlag) {
+    riskFlags = { ...riskFlags, enchantment: true };
+  }
+
+  // Merge metacognitive with LLM detector insights
+  let finalMetacognitive = metacognitiveSignal;
+  if (llmContribution.signals?.metacognitive) {
+    finalMetacognitive = {
+      ...metacognitiveSignal,
+      // LLM detector provides better coherence estimate
+      coherence: llmContribution.signals.metacognitive.coherence ?? metacognitiveSignal?.coherence,
+      // Merge uncertainty (take lower = more certain)
+      uncertainty: Math.min(
+        llmContribution.signals.metacognitive.uncertainty ?? 1,
+        metacognitiveSignal?.uncertainty ?? 1
+      ),
+    };
+  }
 
   const generationTime = Date.now() - startTime;
 
   return {
-    delegation_pred: delegationPred,
+    delegation_pred: adsResult?.prediction,
     risk_flags: riskFlags,
-    policy_adjustments: policyAdjustments,
+    policy_adjustments: mergedPolicy,  // Use merged policy from ADS + Second Order
     candidate_suggestions: candidateSuggestions,
     memory: memoryPrior,
-    metacognitive: metacognitiveSignal,
+    metacognitive: finalMetacognitive,
     temporal: temporalSignal,
     vetoes,
     generated_at: Date.now(),
     generation_time_ms: generationTime,
     contributors,
+
+    // Extended fields from LLM detector
+    existential_content: llmContribution.signals?.existential_content,
+    existential_specificity: llmContribution.signals?.existential_specificity,
+    llm_detector: {
+      called: llmContribution.used,
+      reason: llmContribution.reason,
+      timeout: llmContribution.signals?.llm_detector_timeout ?? false,
+    },
+
+    // Policy trace for debugging
+    policy_trace: policyTrace,
+
+    // Second Order detection scores
+    second_order_detection: secondOrderResult?.detection,
   };
 }
 
@@ -586,10 +841,46 @@ export function generateFastSignals(input: BridgeInput): EarlySignals {
   const riskFlags = extractRiskFlags(input.dimensional_state, input.field_state);
   contributors.push('risk');
 
-  return {
-    delegation_pred: delegationPred,
-    risk_flags: riskFlags,
-    policy_adjustments: policyAdjustments,
+  // ============================================
+  // POLICY MERGE: ADS (HARD) → Second Order (SOFT)
+  // ============================================
+
+  // Extract Second Order Observer signals
+  const secondOrderResult = extractSecondOrderSignals(
+    input.message,
+    input.recent_system_responses ?? [],
+    input.field_state.loop_count
+  );
+  if (secondOrderResult) contributors.push('second_order');
+
+  // Merge policies in order: Base → ADS → Second Order
+  let mergedPolicy = policyAdjustments ?? {};
+  if (delegationPred?.policy) {
+    mergedPolicy = mergePolicyAdjustments(mergedPolicy, delegationPred.policy);
+  }
+  if (secondOrderResult?.policy) {
+    mergedPolicy = mergePolicyAdjustments(mergedPolicy, secondOrderResult.policy);
+  }
+
+  // Add enchantment flag to risk flags if detected
+  let finalRiskFlags = riskFlags;
+  if (secondOrderResult?.enchantmentFlag) {
+    finalRiskFlags = { ...riskFlags, enchantment: true };
+  }
+
+  // Build policy trace for debugging
+  const policyTrace: PolicyAdjustmentTrace = {
+    ads_policy: delegationPred?.policy ?? {},
+    second_order_policy: secondOrderResult?.policy ?? {},
+    merged_policy: mergedPolicy as PolicyAdjustments,
+    ads_reasoning: delegationPred?.reasoning,
+    second_order_reasoning: secondOrderResult?.reasoning,
+  };
+
+  const result: ExtendedEarlySignals = {
+    delegation_pred: delegationPred?.prediction,
+    risk_flags: finalRiskFlags,
+    policy_adjustments: mergedPolicy,
     candidate_suggestions: [],  // Skip async disciplines
     memory: memoryPrior,
     metacognitive: metacognitiveSignal,
@@ -598,7 +889,10 @@ export function generateFastSignals(input: BridgeInput): EarlySignals {
     generated_at: Date.now(),
     generation_time_ms: Date.now() - startTime,
     contributors,
+    policy_trace: policyTrace,
+    second_order_detection: secondOrderResult?.detection,
   };
+  return result;
 }
 
 // Types and functions are exported inline above

@@ -60,6 +60,11 @@ export interface DelegationPrediction {
 /**
  * Policy adjustments from memory/swarm/meta.
  * These modify constraints, not content.
+ *
+ * OWNERSHIP:
+ * - ADS (HARD): disable_tools, must_require_user_effort, brevity_delta
+ * - Second Order (SOFT): warmth_delta, force_pronouns, brevity_delta
+ * - Both can set brevity_delta; merge takes min (more negative = more brief)
  */
 export interface PolicyAdjustments {
   /** Budget deltas for specific resources */
@@ -77,8 +82,97 @@ export interface PolicyAdjustments {
   /** Force specific pronoun style */
   force_pronouns?: 'i_you' | 'we' | 'impersonal';
 
-  /** Disable tools */
+  /** Disable tools (HARD - ADS only) */
   disable_tools?: boolean;
+
+  /** Force user effort requirement (HARD - ADS only) */
+  must_require_user_effort?: boolean;
+}
+
+// ============================================
+// POLICY ADJUSTMENTS MERGE
+// ============================================
+
+/**
+ * Merge ADS (HARD) and Second Order (SOFT) policy adjustments.
+ *
+ * Order: ADS first, then Second Order.
+ *
+ * Merge rules:
+ * - must_require_user_effort: OR (once true, stays true)
+ * - disable_tools: OR (once true, stays true)
+ * - brevity_delta: min (more negative = more brief)
+ * - warmth_delta: sum clamped to [-1, +1]
+ * - force_pronouns: Second Order only (ADS must not set it)
+ * - max_length: min (shorter wins)
+ *
+ * INVARIANT: Merge never loosens constraints (monotonic).
+ */
+export function mergePolicyAdjustments(
+  adsPolicy: Partial<PolicyAdjustments>,
+  secondOrderPolicy: Partial<PolicyAdjustments>
+): PolicyAdjustments {
+  const merged: PolicyAdjustments = {};
+
+  // ---- HARD constraints (ADS) ----
+  // OR logic: once true, stays true
+  if (adsPolicy.must_require_user_effort || secondOrderPolicy.must_require_user_effort) {
+    merged.must_require_user_effort = true;
+  }
+
+  if (adsPolicy.disable_tools || secondOrderPolicy.disable_tools) {
+    merged.disable_tools = true;
+  }
+
+  // ---- max_length: min (shorter wins) ----
+  if (adsPolicy.max_length !== undefined || secondOrderPolicy.max_length !== undefined) {
+    const adsLen = adsPolicy.max_length ?? Infinity;
+    const soLen = secondOrderPolicy.max_length ?? Infinity;
+    const minLen = Math.min(adsLen, soLen);
+    if (minLen !== Infinity) {
+      merged.max_length = minLen;
+    }
+  }
+
+  // ---- brevity_delta: min (more negative = more brief) ----
+  if (adsPolicy.brevity_delta !== undefined || secondOrderPolicy.brevity_delta !== undefined) {
+    const adsBrev = adsPolicy.brevity_delta ?? 0;
+    const soBrev = secondOrderPolicy.brevity_delta ?? 0;
+    merged.brevity_delta = Math.min(adsBrev, soBrev);
+  }
+
+  // ---- warmth_delta: sum clamped to [-1, +1] ----
+  if (adsPolicy.warmth_delta !== undefined || secondOrderPolicy.warmth_delta !== undefined) {
+    const adsWarmth = adsPolicy.warmth_delta ?? 0;
+    const soWarmth = secondOrderPolicy.warmth_delta ?? 0;
+    merged.warmth_delta = Math.max(-1, Math.min(1, adsWarmth + soWarmth));
+  }
+
+  // ---- force_pronouns: Second Order only ----
+  // ADS should not set this; if it does, Second Order takes priority
+  if (secondOrderPolicy.force_pronouns) {
+    merged.force_pronouns = secondOrderPolicy.force_pronouns;
+  } else if (adsPolicy.force_pronouns) {
+    merged.force_pronouns = adsPolicy.force_pronouns;
+  }
+
+  // ---- budget_deltas: merge (take lower values) ----
+  if (adsPolicy.budget_deltas || secondOrderPolicy.budget_deltas) {
+    merged.budget_deltas = { ...adsPolicy.budget_deltas, ...secondOrderPolicy.budget_deltas };
+  }
+
+  return merged;
+}
+
+/**
+ * Debug info for policy adjustment chain.
+ */
+export interface PolicyAdjustmentTrace {
+  ads_policy: Partial<PolicyAdjustments>;
+  second_order_policy: Partial<PolicyAdjustments>;
+  merged_policy: PolicyAdjustments;
+  ads_reasoning?: string;
+  second_order_reasoning?: string;
 }
 
 /**

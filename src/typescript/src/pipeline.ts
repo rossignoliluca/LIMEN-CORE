@@ -132,6 +132,11 @@ import {
   RenderResult,
 } from './plan_renderer';
 
+import {
+  verifyAndFixPlan,
+  PlanVerification,
+} from './plan_act_verifier';
+
 // ============================================
 // PIPELINE CONFIG
 // ============================================
@@ -688,8 +693,46 @@ async function executeV3Flow(input: V3FlowInput): Promise<V3FlowResult> {
     }
   }
 
+  // ---- VERIFY AND FIX PLAN (Constitutional Enforcement) ----
+  // This is the constitutional verifier between S3b and S4
+  // It can only RESTRICT or SUBSTITUTE, never add content
+  //
+  // Note: We construct minimal EarlySignals from the plan's metadata
+  // since the full signals aren't passed through PhasedSelectionResult
+  const minimalSignals: EarlySignals = {
+    risk_flags: lifecyclePlan.metadata.risk,
+    delegation_pred: lifecyclePlan.metadata.ads ? {
+      ads: lifecyclePlan.metadata.ads,
+      motive: lifecyclePlan.metadata.motive ?? {
+        genuine_incapacity: 0,
+        time_saving_tooling: 0,
+        time_saving_substitution: 0,
+        emotional_offload: 0,
+        decision_avoidance: 0,
+        validation_seeking: 0,
+        habit: 0,
+      },
+      should_intervene: (lifecyclePlan.metadata.ads?.final ?? 0) > 0.6,
+      intervention_level: lifecyclePlan.metadata.ads?.final ?? 0,
+    } : undefined,
+  };
+  const planVerification = verifyAndFixPlan(lifecyclePlan, minimalSignals);
+
+  // Use the verified/fixed plan for rendering
+  const verifiedPlan = planVerification.final_plan;
+
+  if (process.env.ENOQ_DEBUG && planVerification.fixes_applied.length > 0) {
+    console.log(`[V3] PlanActVerifier fixes: ${planVerification.fixes_applied.length}`);
+    for (const fix of planVerification.fixes_applied) {
+      console.log(`  - [${fix.violation_rule_id}] ${fix.fix_type}: ${fix.before} → ${fix.after}`);
+    }
+    if (planVerification.fallback_used) {
+      console.log(`[V3] PlanActVerifier used fallback plan`);
+    }
+  }
+
   // ---- RENDER PLAN TO TEXT ----
-  const renderResult = renderPlan(lifecyclePlan);
+  const renderResult = renderPlan(verifiedPlan);
 
   // ---- CALCULATE INFLUENCE USED ----
   const influenceUsed = calculateInfluenceUsed(lifecyclePlan);
@@ -699,8 +742,9 @@ async function executeV3Flow(input: V3FlowInput): Promise<V3FlowResult> {
     console.log(`[V3] Candidates: ${phasedResult.s3a.candidates.candidates.length}`);
     console.log(`[V3] EarlySignals arrived: ${phasedResult.early_signals_status.arrived_before_deadline}`);
     console.log(`[V3] Contributors: ${phasedResult.early_signals_status.signals_received}`);
-    console.log(`[V3] Plan ID: ${lifecyclePlan.id}`);
-    console.log(`[V3] Acts: ${lifecyclePlan.acts.map(a => a.type).join(', ')}`);
+    console.log(`[V3] Plan ID: ${verifiedPlan.id}`);
+    console.log(`[V3] Acts: ${verifiedPlan.acts.map(a => a.type).join(', ')}`);
+    console.log(`[V3] Verifier: valid=${planVerification.valid}, fixes=${planVerification.fixes_applied.length}, fallback=${planVerification.fallback_used}`);
     console.log(`[V3] Rendered: ${renderResult.acts_rendered.join(', ')}`);
     if (renderResult.constraint_warnings.length > 0) {
       console.log(`[V3] Render warnings: ${renderResult.constraint_warnings.join(', ')}`);
