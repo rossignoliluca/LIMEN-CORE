@@ -9,9 +9,9 @@
 | Path | Role |
 |------|------|
 | [AXIS/](/AXIS/) | Constitutional ground (frozen) |
-| [REPO_CONTRACT.md](./REPO_CONTRACT.md) | Repository rules (6 frozen) |
-| [src/typescript/src/core/](/src/typescript/src/core/) | **Canonical target** (modules + pipeline + signals) |
-| [src/typescript/src/runtime/](/src/typescript/src/runtime/) | Current entrypoint (`enoq()`) |
+| [REPO_CONTRACT.md](./REPO_CONTRACT.md) | Repository rules (7 frozen) |
+| [core/pipeline/orchestrator.ts](/src/typescript/src/core/pipeline/orchestrator.ts) | **Canonical wrapper** (`enoqCore()`) - Slice 1 |
+| [src/typescript/src/runtime/](/src/typescript/src/runtime/) | Current logic (`enoq()`) - delegated by core |
 
 ---
 
