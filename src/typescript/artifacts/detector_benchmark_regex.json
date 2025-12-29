@@ -78,7 +78,7 @@
   },
   "llm_calls": 0,
   "llm_call_rate": 0,
-  "avg_latency_ms": 0.14,
+  "avg_latency_ms": 0.16,
   "p95_latency_ms": 1,
   "failures": [
     {

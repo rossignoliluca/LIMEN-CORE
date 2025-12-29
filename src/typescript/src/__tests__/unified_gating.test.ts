@@ -10,7 +10,7 @@
 import { UnifiedGating, UnifiedGatingStats } from '../operational/gating/unified_gating';
 import { DimensionalDetector, DimensionalState } from '../operational/detectors/dimensional_system';
 import { BENCHMARK_CASES } from '../benchmarks/cases/benchmark_cases';
-import { LLMDetectorCache } from '../gate/thresholds/llm_cache';
+import { LLMDetectorCache } from '../external/cache/llm_cache';
 
 describe('Unified Gating', () => {
   let gating: UnifiedGating;

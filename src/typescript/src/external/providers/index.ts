@@ -35,4 +35,4 @@ export {
 } from '../../operational/providers/gate_embedded';
 export type { EmbeddedGateResult } from '../../operational/providers/gate_embedded';
 
-export * from '../../gate/thresholds/llm_cache';
+export * from '../../external/cache/llm_cache';

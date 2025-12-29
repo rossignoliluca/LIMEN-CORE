@@ -11,7 +11,7 @@ import { UnifiedGating } from '../operational/gating/unified_gating';
 import { DimensionalDetector } from '../operational/detectors/dimensional_system';
 import { BENCHMARK_CASES } from '../benchmarks/cases/benchmark_cases';
 import { REALISTIC_CASES, REALISTIC_DISTRIBUTION } from '../benchmarks/cases/benchmark_cases_realistic';
-import { LLMDetectorCache } from '../gate/thresholds/llm_cache';
+import { LLMDetectorCache } from '../external/cache/llm_cache';
 
 describe('Unified Gating v5.1 Validation', () => {
   // ==========================================

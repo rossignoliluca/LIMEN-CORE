@@ -154,7 +154,7 @@ export {
   LLMDetectorCache,
   CacheConfig,
   CacheStats,
-} from './gate/thresholds/llm_cache';
+} from './external/cache/llm_cache';
 
 // Geometry Normative
 export { applyDomainGovernor, GovernorResult } from './gate/enforcement/domain_governor';

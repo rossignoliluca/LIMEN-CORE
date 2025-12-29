@@ -23,7 +23,7 @@
 import { DimensionalState } from '../../operational/detectors/dimensional_system';
 import { SupportedLanguage } from '../../interface/types';
 import { NPGating, NPGatingDecision, DEFAULT_NP_CONFIG } from './np_gating';
-import { LLMDetectorCache, CacheStats } from '../../gate/thresholds/llm_cache';
+import { LLMDetectorCache, CacheStats } from '../../external/cache/llm_cache';
 import { RegimeClassification } from '../../operational/detectors/llm_detector_v2';
 
 // ============================================

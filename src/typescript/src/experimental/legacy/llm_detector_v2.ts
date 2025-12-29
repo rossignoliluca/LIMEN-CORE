@@ -28,7 +28,7 @@ import {
 } from '../../interface/types';
 import { DimensionalDetector, DimensionalState } from '../../operational/detectors/dimensional_system';
 import { EarlySignals, MetacognitiveSignal, DEADLINE_CONFIG } from '../../operational/signals/early_signals';
-import { LLMDetectorCache, CacheStats } from '../../gate/thresholds/llm_cache';
+import { LLMDetectorCache, CacheStats } from '../../external/cache/llm_cache';
 import { ScientificGating, GatingDecision as ScientificGatingDecision, GatingStats } from '../../operational/gating/scientific_gating';
 
 // Re-export shared types for backwards compatibility

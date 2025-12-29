@@ -183,11 +183,11 @@ export {
 } from './invariants/axis';
 
 // ============================================================================
-// THRESHOLDS
+// THRESHOLDS (re-export from external/cache)
 // ============================================================================
 
 export {
   CacheEntry,
   CacheConfig,
   CacheStats
-} from './thresholds/llm_cache';
+} from '../external/cache/llm_cache';
