@@ -3,7 +3,7 @@
 **Document ID:** ENOQ-MEMORY  
 **Status:** Core Architecture  
 **Date:** 2025-12-25  
-**Depends On:** CONSTITUTION.md, OS-SPEC.md  
+**Depends On:** AXIS/INVARIANTS.md, OS-SPEC.md  
 
 ---
 

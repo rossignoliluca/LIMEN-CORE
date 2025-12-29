@@ -3,7 +3,7 @@
 **Document ID:** ENOQ-OS-SPEC  
 **Status:** Core Architecture  
 **Date:** 2025-12-25  
-**Depends On:** CONSTITUTION.md  
+**Depends On:** AXIS/INVARIANTS.md  
 
 ---
 

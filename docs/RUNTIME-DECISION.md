@@ -3,7 +3,7 @@
 **Document ID:** ENOQ-RUNTIME-DECISION  
 **Status:** Core Runtime  
 **Date:** 2025-12-25  
-**Depends On:** CONSTITUTION.md, OS-SPEC.md, RUNTIME-HUMAN-FIELD.md  
+**Depends On:** AXIS/INVARIANTS.md, OS-SPEC.md, RUNTIME-HUMAN-FIELD.md  
 **Type:** Core (pre-defined, optimized)  
 
 ---

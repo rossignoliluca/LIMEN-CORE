@@ -1,3 +1,11 @@
+# OUTDATED (Legacy)
+
+Preserved for historical context.
+V3.1 architecture superseded by v6.0.
+Do not use for implementation.
+
+---
+
 # ENOQ v3.1 - Runtime Flow
 
 ## Overview

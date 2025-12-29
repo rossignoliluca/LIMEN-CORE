@@ -1,3 +1,11 @@
+# OUTDATED (Legacy)
+
+Preserved for historical context.
+Canonical: AXIS/INVARIANTS.md
+Do not use for implementation.
+
+---
+
 # ENOQ CONSTITUTION v1.0
 
 **Status:** Constitutional — Cannot be modified without unanimous consent  
