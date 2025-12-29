@@ -1,3 +1,11 @@
+# OUTDATED (Legacy)
+
+Preserved for historical context.
+Canonical docs: docs/INDEX.md and docs/REPO_CONTRACT.md
+Do not use for implementation.
+
+---
+
 # ENOQ v3.1 - System Invariants
 
 These 5 invariants are **inviolable**. If any breaks, the system is compromised.

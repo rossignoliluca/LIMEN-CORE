@@ -58,10 +58,8 @@
 
 ### Runtime
 
-| Document | Purpose |
-|----------|---------|
-| [V5_1_ROUTING.md](/src/typescript/docs/V5_1_ROUTING.md) | Unified gating system |
-| [V4_ROUTING.md](/src/typescript/docs/V4_ROUTING.md) | Previous routing (reference) |
+> For current routing, see [ARCHITECTURE.md](/src/typescript/docs/ARCHITECTURE.md).
+> Legacy routing docs moved to [docs/legacy/](./legacy/).
 
 ---
 
