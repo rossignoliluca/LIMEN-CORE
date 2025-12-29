@@ -1,5 +1,5 @@
 /**
- * LIMEN INTERACTIVE SESSION
+ * ENOQ INTERACTIVE SESSION
  *
  * Real-time conversation with the full ENOQ system.
  */

@@ -1,5 +1,5 @@
 /**
- * LIMEN Total System Bridge
+ * ENOQ Total System Bridge
  *
  * Connects TotalSystem to the pipeline via EarlySignals.
  *

@@ -1,5 +1,5 @@
 /**
- * LIMEN S5 VERIFY
+ * ENOQ S5 VERIFY
  * 
  * Constitutional enforcement layer.
  * Validates every output before delivery.

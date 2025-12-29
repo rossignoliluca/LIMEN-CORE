@@ -1,5 +1,5 @@
 /**
- * LIMEN Plan Renderer - Template-First Response Generation
+ * ENOQ Plan Renderer - Template-First Response Generation
  *
  * Converts ResponsePlan to text.
  *

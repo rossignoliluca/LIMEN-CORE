@@ -1,5 +1,5 @@
 /**
- * LIMEN HYBRID DIMENSIONAL DETECTOR
+ * ENOQ HYBRID DIMENSIONAL DETECTOR
  *
  * Combines SOTA (embedding-based) detector with regex fallback.
  *

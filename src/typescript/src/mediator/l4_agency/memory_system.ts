@@ -1,5 +1,5 @@
 /**
- * LIMEN MEMORY SYSTEM
+ * ENOQ MEMORY SYSTEM
  *
  * Complementary Learning Systems (CLS) inspired architecture:
  * - Hippocampal System: Fast, episodic, sparse representations

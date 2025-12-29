@@ -1,5 +1,5 @@
 /**
- * LIMEN L1 PERCEPTION
+ * ENOQ PERCEPTION
  * 
  * Transforms raw input into structured Field State.
  * Does NOT generate response. Only perceives.

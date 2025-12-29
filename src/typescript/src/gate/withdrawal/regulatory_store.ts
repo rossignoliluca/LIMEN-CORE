@@ -1,5 +1,5 @@
 /**
- * LIMEN REGULATORY STORE
+ * ENOQ REGULATORY STORE
  *
  * Minimal persistence for regulatory state only.
  * NO user content, NO messages, NO profiles.

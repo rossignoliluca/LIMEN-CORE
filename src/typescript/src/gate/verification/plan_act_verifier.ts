@@ -1,5 +1,5 @@
 /**
- * LIMEN Plan Act Verifier
+ * ENOQ Plan Act Verifier
  *
  * Constitutional enforcement on ResponsePlan BEFORE rendering.
  * Position: Between S3b (commit) and S4 (render).

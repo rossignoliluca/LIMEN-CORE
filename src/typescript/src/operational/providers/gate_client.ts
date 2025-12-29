@@ -1,11 +1,11 @@
 /**
- * LIMEN GATE CLIENT
+ * ENOQ GATE CLIENT
  *
  * HTTP client for gate-runtime integration.
  * Calls Gate BEFORE any LLM generation.
  *
  * Gate signals which domain is active, then halts.
- * LIMEN decides what to do with that signal.
+ * ENOQ decides what to do with that signal.
  */
 
 import * as crypto from 'crypto';
@@ -235,7 +235,7 @@ export class GateClient {
  * Map Gate signal to ENOQ behavior modifications.
  *
  * Gate tells us WHAT domain is perturbed.
- * LIMEN decides HOW to respond.
+ * ENOQ decides HOW to respond.
  */
 export interface GateSignalEffect {
   // Should ENOQ proceed with generation?

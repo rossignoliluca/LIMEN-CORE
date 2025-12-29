@@ -1,5 +1,5 @@
 /**
- * LIMEN L2 EXECUTION ENGINE
+ * ENOQ L2 EXECUTION ENGINE
  * 
  * Multi-domain execution. Blind to field. Constrained by context.
  * 
@@ -993,7 +993,7 @@ async function executeDeep(context: ExecutionContext): Promise<string> {
 
     try {
       const reasoningResponse = await callLLM({
-        system: `You are LIMEN's reasoning layer. Analyze the situation briefly.
+        system: `You are ENOQ's reasoning layer. Analyze the situation briefly.
 Output a JSON object with:
 - patterns: key patterns you notice (max 3)
 - focus: what the response should focus on

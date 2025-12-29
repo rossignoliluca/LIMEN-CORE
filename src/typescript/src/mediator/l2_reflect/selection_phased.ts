@@ -1,5 +1,5 @@
 /**
- * LIMEN Selection Phased - Two-Phase Selection (S3a/S3b)
+ * ENOQ Selection Phased - Two-Phase Selection (S3a/S3b)
  *
  * Closes the historical GAP: no more one-shot commit before signals arrive.
  *

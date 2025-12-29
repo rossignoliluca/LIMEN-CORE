@@ -1,5 +1,5 @@
 /**
- * LIMEN Early Signals - Bounded Contributor Contract
+ * ENOQ Early Signals - Bounded Contributor Contract
  *
  * EarlySignals is how TotalSystem contributes to the pipeline in real-time.
  *

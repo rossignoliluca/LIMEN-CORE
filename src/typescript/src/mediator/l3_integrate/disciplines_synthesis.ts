@@ -1,5 +1,5 @@
 /**
- * LIMEN DISCIPLINES SYNTHESIS
+ * ENOQ DISCIPLINES SYNTHESIS
  *
  * Complete integration of 215 disciplines into a unified cognitive architecture.
  *

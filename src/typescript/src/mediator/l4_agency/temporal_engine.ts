@@ -1,5 +1,5 @@
 /**
- * LIMEN TEMPORAL REASONING ENGINE
+ * ENOQ TEMPORAL REASONING ENGINE
  *
  * Temporal reasoning and causal inference system.
  *

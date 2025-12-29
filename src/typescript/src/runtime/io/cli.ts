@@ -1,7 +1,7 @@
 #!/usr/bin/env npx ts-node
 
 /**
- * LIMEN CLI
+ * ENOQ CLI
  * 
  * Interactive command-line interface for ENOQ.
  * 

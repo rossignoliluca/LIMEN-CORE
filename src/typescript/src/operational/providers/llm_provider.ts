@@ -1,5 +1,5 @@
 /**
- * LIMEN LLM PROVIDER
+ * ENOQ LLM PROVIDER
  *
  * Multi-LLM abstraction layer.
  * Reads API keys from environment variables.

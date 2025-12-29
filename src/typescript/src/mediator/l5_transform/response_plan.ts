@@ -1,5 +1,5 @@
 /**
- * LIMEN Response Plan - Builder Functions
+ * ENOQ Response Plan - Builder Functions
  *
  * ResponsePlan types are defined in interface/types.ts.
  * This module provides builder functions for creating plans.

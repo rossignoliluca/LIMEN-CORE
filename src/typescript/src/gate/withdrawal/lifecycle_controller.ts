@@ -1,5 +1,5 @@
 /**
- * LIMEN Lifecycle Controller - Stub (Phase B Ready)
+ * ENOQ Lifecycle Controller - Stub (Phase B Ready)
  *
  * Manages the system's lifecycle: influence budget, termination, dormancy.
  *

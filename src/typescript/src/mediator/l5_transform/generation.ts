@@ -1,5 +1,5 @@
 /**
- * LIMEN L1 GENERATION
+ * ENOQ GENERATION
  * 
  * Produces bounded linguistic output from Protocol Selection.
  * Template-based for surface/medium. LLM-assisted for deep.

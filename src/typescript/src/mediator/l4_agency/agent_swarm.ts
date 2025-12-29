@@ -1,5 +1,5 @@
 /**
- * LIMEN MULTI-AGENT SWARM ARCHITECTURE
+ * ENOQ MULTI-AGENT SWARM ARCHITECTURE
  *
  * Inspired by:
  * - Global Workspace Theory (Baars) - conscious broadcast

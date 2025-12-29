@@ -1,5 +1,5 @@
 /**
- * LIMEN DOMAIN GOVERNOR
+ * ENOQ DOMAIN GOVERNOR
  * 
  * Manages coexistence between domains.
  * Risk emerges from combinations, not single domains.

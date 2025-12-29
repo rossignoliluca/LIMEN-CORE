@@ -1,5 +1,5 @@
 /**
- * LIMEN DIMENSIONAL SYSTEM
+ * ENOQ DIMENSIONAL SYSTEM
  *
  * Multidimensional detection and integration:
  * - Vertical Dimensions: Somatic → Functional → Relational → Existential → Transcendent

@@ -1,5 +1,5 @@
 /**
- * LIMEN L1 SELECTION
+ * ENOQ SELECTION
  * 
  * Maps Field State to Protocol Selection.
  * Deterministic. Auditable. No generation.

@@ -1,5 +1,5 @@
 /**
- * LIMEN PIPELINE - S0 → S6 ORCHESTRATOR
+ * ENOQ PIPELINE - S0 → S6 ORCHESTRATOR
  *
  * The thread that connects everything.
  * Input → Gate → Perceive → Select → Act → Verify → Return

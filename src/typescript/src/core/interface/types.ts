@@ -1,5 +1,5 @@
 /**
- * LIMEN L1 CORE - TYPE DEFINITIONS
+ * ENOQ CORE - TYPE DEFINITIONS
  * 
  * The fundamental data structures for the perception-action pipeline.
  */

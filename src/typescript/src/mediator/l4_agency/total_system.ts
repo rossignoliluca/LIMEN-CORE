@@ -1,5 +1,5 @@
 /**
- * LIMEN TOTAL SYSTEM ORCHESTRATOR
+ * ENOQ TOTAL SYSTEM ORCHESTRATOR
  *
  * Integrates all components into a unified cognitive system.
  * The "invention of the century" - a complete cognitive architecture

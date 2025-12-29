@@ -1,5 +1,5 @@
 /**
- * LIMEN META KERNEL (L0.5)
+ * ENOQ META KERNEL (L0.5)
  * 
  * Power governor. Content-blind.
  * Reads telemetry, controls knobs.

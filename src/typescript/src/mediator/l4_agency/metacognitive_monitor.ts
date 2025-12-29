@@ -1,5 +1,5 @@
 /**
- * LIMEN METACOGNITIVE MONITOR
+ * ENOQ METACOGNITIVE MONITOR
  *
  * Self-awareness and introspection system.
  *
