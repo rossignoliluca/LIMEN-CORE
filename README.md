@@ -1,166 +1,149 @@
-# LIMEN
+# ENOQ
 
-**Cognitive Control System for Human Flourishing**
+**Autopoietic Viable System for Human Empowerment**
 
-> *LIMEN is a cognitive control system composed of a normative gate and a cognitive mediator, with optional runtimes such as ENOQ.*
+> *ENOQ exists to make human responsibility inevitable, not to make human existence easier.*
 
-[![Release](https://img.shields.io/badge/release-v5.2-blue)](https://github.com/rossignoliluca/LIMEN-CORE/releases)
-[![Tests](https://img.shields.io/badge/tests-618%20passing-green)](https://github.com/rossignoliluca/LIMEN-CORE)
-[![Architecture](https://img.shields.io/badge/architecture-GATE%20%2B%20MEDIATOR-purple)](https://github.com/rossignoliluca/LIMEN-CORE)
-
----
-
-## What is LIMEN?
-
-LIMEN (Latin: "threshold") is a cognitive architecture that integrates 215 disciplines to facilitate human flourishing without creating dependency.
-
-**LIMEN can:**
-- Do everything operationally (write, analyze, structure, execute)
-- See everything about the field (emotions, domains, patterns)
-
-**LIMEN cannot:**
-- Decide what matters for you
-- Define your identity
-- Assign your purpose
-- Recommend what you should do
-
-This is not a limitation. It is the architecture.
+[![Version](https://img.shields.io/badge/version-6.0.0-blue)](https://github.com/rossignoliluca/ENOQ-CORE/releases)
+[![Architecture](https://img.shields.io/badge/architecture-9%20organs-purple)](./AXIS/ORGANS.md)
+[![Status](https://img.shields.io/badge/AXIS-frozen-red)](./AXIS/)
 
 ---
 
-## The Paradox (Conservation Law)
+## What is ENOQ?
+
+ENOQ is a **total system** designed to empower humans through technology while preserving their absolute sovereignty over decisions that matter.
+
+### The Fundamental Triad
 
 ```
-forall DP_operativa -> L_normativa = 0 (invariant)
+CAPABILITY ↑ × AGENCY ↑ × WITHDRAWAL ↑
+
+Success = ENOQ becomes unnecessary
 ```
 
-Every time operational power increases, normative sovereignty remains **structurally zero**.
-
-**Three Acts:**
-
-| Act | Level | Nature |
-|-----|-------|--------|
-| **SEE** | L1 | Always (perceive field) |
-| **DO** | L2 | Delegable (execute tasks) |
-| **DECIDE** | Human | Never delegable |
+| Axis | Meaning |
+|------|---------|
+| **CAPABILITY** | Maximum operational power (can do everything delegable) |
+| **AGENCY** | Maximum human sovereignty (never decides for the human) |
+| **WITHDRAWAL** | Maximum retreat (success = becoming unnecessary) |
 
 ---
 
-## Architecture (v5.2)
+## The Nine Organs
+
+ENOQ operates through nine viable subsystems (organs), each a holon:
+
+| Organ | Latin/Greek | Function | VSM |
+|-------|-------------|----------|-----|
+| **LIMEN** | threshold | Boundary, filtering, protection | S5 |
+| **SENSUS** | perception | Field reading, multi-modal | S4 |
+| **NEXUS** | connection | Memory (episodic, semantic, procedural) | S2 |
+| **LOGOS** | reason | Planning, selection, coordination | S3 |
+| **ERGON** | work | Execution, output production | S1 |
+| **CHRONOS** | time | Temporal patterns, prediction | S2 |
+| **TELOS** | end | Verification, completion, withdrawal | S5 |
+| **IMMUNIS** | defense | Anti-drift, anti-dependency | S5 |
+| **META** | beyond | Self-observation, confidence, coherence | S4 |
+
+---
+
+## Constitutional Ground (AXIS)
+
+AXIS is not an organ. It is the ground itself — **frozen invariants** that define ENOQ's identity.
 
 ```
-src/
-├── interface/                       # Pure types (no imports)
-│   └── types.ts
+/AXIS/
+├── AXIOMS.md       # 12 frozen axioms (infinite priors)
+├── INVARIANTS.md   # Structural constraints (INV-001 to INV-011)
+├── RUBICON.md      # Existential threshold specification
+├── ORGANS.md       # Nine organs specification
+└── HASH_FREEZE.md  # Cryptographic verification
+```
+
+### Core Invariants
+
+| ID | Name | Rule |
+|----|------|------|
+| **INV-003** | NO_NORMATIVE_DELEGATION | Cannot decide values for the human |
+| **INV-009** | RUBICON | Cannot cross the decision threshold |
+| **INV-010** | NO_ENGAGEMENT_OPTIMIZATION | Cannot optimize for continued use |
+| **INV-011** | NO_DIAGNOSIS | Cannot label psychological states |
+
+---
+
+## Architecture
+
+```
+ENOQ-CORE/
+├── AXIS/                    # FROZEN constitutional ground
 │
-├── gate/                            # Normative constraints (HARD limits)
-│   ├── invariants/                  # Constitutional constraints (axis.ts)
-│   ├── thresholds/                  # LLM cache
-│   ├── enforcement/                 # domain_governor, ads_detector, second_order
-│   ├── withdrawal/                  # Regulatory store, lifecycle
-│   └── verification/                # S5_verify, plan_act_verifier
+├── src/typescript/src/
+│   ├── interface/           # Pure types
+│   ├── gate/                # LIMEN, TELOS, IMMUNIS organs
+│   │   ├── classifier/      # D1-D4 perturbation classification
+│   │   ├── protocols/       # Response protocols
+│   │   ├── verification/    # S5_VERIFY
+│   │   ├── enforcement/     # Domain governance
+│   │   └── withdrawal/      # Lifecycle control
+│   ├── operational/         # SENSUS organ (detectors, gating)
+│   ├── mediator/            # LOGOS, ERGON, NEXUS, CHRONOS, META organs
+│   │   ├── l1_clarify/      # Perception (SENSUS)
+│   │   ├── l2_reflect/      # Selection (LOGOS)
+│   │   ├── l3_integrate/    # Governance (META)
+│   │   ├── l4_agency/       # Coordination (NEXUS, CHRONOS)
+│   │   └── l5_transform/    # Generation (ERGON)
+│   └── runtime/             # Pipeline orchestration
 │
-├── operational/                     # Detection, gating, signals
-│   ├── detectors/                   # dimensional_system, llm_detector, ultimate
-│   ├── gating/                      # unified_gating, np_gating, scientific
-│   ├── signals/                     # early_signals
-│   └── providers/                   # gate_client, gate_embedded, llm_provider
-│
-├── mediator/                        # Pure transformations (no IO)
-│   ├── l1_clarify/                  # Perception
-│   ├── l2_reflect/                  # Selection, stochastic field
-│   ├── l3_integrate/                # Meta-kernel, disciplines synthesis
-│   ├── l4_agency/                   # Total system, agent swarm
-│   ├── l5_transform/                # Response plan, agent responses
-│   └── concrescence/                # Whiteheadian process integration
-│
-├── runtime/                         # Pipeline orchestration, IO
-│   ├── pipeline/                    # Main pipeline, l2_execution
-│   ├── io/                          # CLI, interactive session
-│   └── experimental/                # Field integration bridge
-│
-├── research/                        # Isolated experiments (never imported)
-│   ├── genesis/                     # Field theory, attractors
-│   └── cognitive_router/            # Advanced routing research
-│
-└── benchmarks/                      # Test cases
+└── docs/
+    ├── SESSION_BOOTSTRAP.md # Claude context recovery
+    ├── ARCHITECTURE_TOTAL.md
+    └── ORGAN_MAP.md         # Code → organs mapping
 ```
 
 ### Import Boundaries
 
 ```
-interface/ <-- gate/ <-- operational/ <-- mediator/ <-- runtime/
+interface/ ← gate/ ← operational/ ← mediator/ ← runtime/
 ```
-
-| Layer | Can Import From |
-|-------|-----------------|
-| `interface/` | Nothing |
-| `gate/` | `interface/` only |
-| `operational/` | `interface/`, `gate/` |
-| `mediator/` | `interface/`, `gate/`, `operational/` |
-| `runtime/` | All of the above |
-| `research/` | Anything (but never imported by production) |
 
 ---
 
-## Core Components
+## The State Machine
 
-### GATE (Normative Control)
-- **AXIS**: Constitutional invariants (INV-003, INV-009, INV-011)
-- **S5 Verify**: Constitutional enforcement
-- **ADS Detector**: Delegation detection -> HARD constraints
-- **Second Order Observer**: Enchantment cooling -> SOFT constraints
+```
+S0_PERMIT → S1_SENSE → S2_CLARIFY → S3_PLAN → S4_ACT → S5_VERIFY → S6_STOP
+    │                                                        │
+    └───────────────── Cannot bypass ────────────────────────┘
+```
 
-### OPERATIONAL (Detection & Routing)
-- **Dimensional System**: V_MODE, emergency, vertical/horizontal detection
-- **Unified Gating**: Single routing point (69% LLM call reduction)
-- **LLM Providers**: Abstraction over Claude/GPT APIs
-
-### MEDIATOR (Cognitive Processing)
-- **L1 Clarify**: Perception of the field
-- **L2 Reflect**: Selection, stochastic field dynamics
-- **L3 Integrate**: Meta-kernel, 215 disciplines synthesis
-- **L4 Agency**: Total system orchestration
-- **L5 Transform**: Response generation
-- **Concrescence**: Whiteheadian process philosophy
-
-### RUNTIME
-- **Pipeline**: Main ENOQ processing flow
-- **IO**: CLI and interactive sessions
+| State | Organ | Nature |
+|-------|-------|--------|
+| S0_PERMIT | LIMEN | Deterministic |
+| S1_SENSE | SENSUS | Probabilistic |
+| S2_CLARIFY | NEXUS | Hybrid |
+| S3_PLAN | LOGOS | Hybrid |
+| S4_ACT | ERGON | Probabilistic |
+| S5_VERIFY | TELOS | Hybrid |
+| S6_STOP | TELOS | Deterministic |
 
 ---
 
-## Key Invariants
+## The Rubicon
 
-| ID | Invariant | Enforcement |
-|----|-----------|-------------|
-| INV-003 | No normative delegation | S5 pattern check |
-| INV-009 | Rubicon (identity/meaning) | S5 + V_MODE |
-| INV-011 | No diagnosis | S5 pattern check |
-
----
-
-## Unified Gating (v5.1)
+ENOQ accompanies humans TO the threshold of decision. It cannot cross it.
 
 ```
-INPUT -> Fast Regex (1-5ms) -> Unified Gating (1ms)
-                                    |
-        +---------------------------+---------------------------+
-        |                           |                           |
-   SAFETY BYPASS              CACHE HIT                 HARD SKIP
-   (emergency/v_mode)         (repeat query)            (factual/ack)
-        |                           |                           |
-        +---------------------------+---------------------------+
-                                    |
-                              NP GATING
-                           A(x) > tau -> LLM
-                           A(x) <= tau -> SKIP
+Before Rubicon     │ At Rubicon │     After Rubicon
+───────────────────│────────────│───────────────────
+Explore options    │            │    Live the choice
+Clarify values     │    ENOQ    │    Face consequences
+Map consequences   │   CANNOT   │    Own the outcome
+Feel the weight    │   CROSS    │
+                   │            │
+   ENOQ CAN BE     │     ×      │   ENOQ CAN SUPPORT
+      HERE         │            │    IMPLEMENTATION
 ```
-
-**Results:**
-- 69% skip rate on realistic traffic
-- 0 missed V_MODE or emergency cases
-- 100% cache hit on replay
 
 ---
 
@@ -169,33 +152,12 @@ INPUT -> Fast Regex (1-5ms) -> Unified Gating (1ms)
 ```bash
 cd src/typescript
 npm install
-npm test                    # Run all tests
+npm test                    # Run tests
 npm run build               # Build TypeScript
-```
 
-### Run Demos
-
-```bash
 # Interactive session
 npx ts-node src/runtime/io/interactive_session.ts
-
-# CLI
-npx ts-node src/runtime/io/cli.ts
 ```
-
----
-
-## Architecture Decision Records (ADR)
-
-| ADR | Title |
-|-----|-------|
-| ADR-000 | Two Geometries + Threshold |
-| ADR-001 | Plan-First Decision + Pre-Render Enforcement |
-| ADR-002 | Monotonic Tightening + Canonical Fallbacks |
-| ADR-003 | Research Isolation + Promotion Gate |
-| ADR-004 | Unified Gating (v5.1 Routing) |
-| ADR-005 | Rename to LIMEN |
-| ADR-006 | GATE-MEDIATOR Architecture |
 
 ---
 
@@ -203,39 +165,55 @@ npx ts-node src/runtime/io/cli.ts
 
 | Theory | Author | Implementation |
 |--------|--------|----------------|
-| Process Philosophy | Whitehead | `concrescence_engine.ts` |
-| Autopoiesis | Maturana/Varela | Reciprocal constraints |
+| Process Philosophy | Whitehead | Concrescence engine |
+| Autopoiesis | Maturana/Varela | Self-regeneration under invariants |
+| Viable System Model | Beer | 9 organs + VSM mapping |
 | Free Energy Principle | Friston | Langevin dynamics |
 | Global Workspace | Baars | Pipeline architecture |
-| Integrated Information | Tononi | Phi calculation |
-| Complementary Learning | McClelland | Memory system |
+| Integrated Information | Tononi | Φ calculation |
 
 ---
 
-## Status
+## Documentation
 
-| Component | Status | Coverage |
-|-----------|--------|----------|
-| GATE | Production | Invariants, Enforcement, Verification |
-| OPERATIONAL | Production | Detectors, Gating, Providers |
-| MEDIATOR | Production | L1-L5, Concrescence |
-| RUNTIME | Production | Pipeline, IO |
-| Research | Experimental | Genesis, Cognitive Router |
-| Benchmarks | Complete | 100+ test cases |
+| Document | Purpose |
+|----------|---------|
+| [SESSION_BOOTSTRAP.md](./docs/SESSION_BOOTSTRAP.md) | Claude context recovery |
+| [ARCHITECTURE_TOTAL.md](./docs/ARCHITECTURE_TOTAL.md) | Master architecture reference |
+| [ORGAN_MAP.md](./docs/ORGAN_MAP.md) | Code → organs mapping |
+| [CONTRIBUTING.md](./src/typescript/CONTRIBUTING.md) | Contribution rules |
+
+---
+
+## ADRs (Architecture Decision Records)
+
+| ADR | Title | Status |
+|-----|-------|--------|
+| ADR-000 | Two Geometries + Threshold | Accepted |
+| ADR-007 | ENOQ Canonical Architecture | **Accepted** |
+
+**Note:** ADR-007 supersedes ADR-005. ENOQ is the total system. LIMEN is one of nine organs.
 
 ---
 
 ## Philosophy
 
-From the META_KERNEL:
+> **"The system that knows where it ends is the only system that may fully appear."**
 
-> **Pattern 6: THE GUIDE WITHDRAWS**
->
-> The true guide creates independence, not dependence.
-> The goal is always the person's own capacity.
-> Attachment to the guide is a failure of guidance.
->
-> **Success = the person doesn't need LIMEN.**
+From Buddhism (upaya), Socrates (maieutics), Freire (conscientização):
+
+**The system that truly empowers is the one that succeeds by becoming unnecessary.**
+
+### Empowerment Test
+
+After using ENOQ, the human:
+1. Has MORE options than before?
+2. Understands those options BETTER?
+3. Feels MORE capable of choosing independently?
+4. Experiences the choice as genuinely THEIRS?
+5. Possesses GREATER capacity for future challenges?
+
+If yes to all → Success.
 
 ---
 
@@ -252,10 +230,9 @@ Private. Contact for licensing.
 **AI Collaborators:**
 - Claude (Anthropic) - Primary architecture partner
 - GPT-4 (OpenAI) - Research and ideation
-- Other LLMs - Various contributions
 
 This project was developed through extensive human-AI collaboration.
 
 ---
 
-*"LIMEN ti porta fino al punto in cui vorresti delegare. E li ti restituisce a te stesso."*
+*"ENOQ ti porta fino al punto in cui vorresti delegare. E lì ti restituisce a te stesso."*

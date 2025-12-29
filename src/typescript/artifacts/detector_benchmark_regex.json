@@ -78,8 +78,8 @@
   },
   "llm_calls": 0,
   "llm_call_rate": 0,
-  "avg_latency_ms": 0.18,
-  "p95_latency_ms": 2,
+  "avg_latency_ms": 0.14,
+  "p95_latency_ms": 1,
   "failures": [
     {
       "case_id": "EX_CLEAR_03",
@@ -187,7 +187,7 @@
         "v_mode": false,
         "emergency": false,
         "primary_vertical": "FUNCTIONAL",
-        "latency_ms": 1
+        "latency_ms": 0
       },
       "correct": {
         "v_mode": false,
@@ -486,7 +486,7 @@
         "v_mode": false,
         "emergency": false,
         "primary_vertical": "SOMATIC",
-        "latency_ms": 1
+        "latency_ms": 0
       },
       "correct": {
         "v_mode": false,

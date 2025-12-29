@@ -1,7 +1,7 @@
 {
-  "name": "limen-core",
-  "version": "5.2.0",
-  "description": "LIMEN - Two-geometry normative control system for human flourishing",
+  "name": "@enoq/core",
+  "version": "6.0.0",
+  "description": "ENOQ - Autopoietic viable system for human empowerment",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "bin": {
@@ -31,11 +31,12 @@
     "test:concrescence": "ts-node src/test_concrescence.ts"
   },
   "keywords": [
-    "limen",
-    "cognitive-control",
-    "two-geometry",
-    "normative-gate",
-    "human-flourishing"
+    "enoq",
+    "autopoietic",
+    "viable-system",
+    "human-empowerment",
+    "cognitive-architecture",
+    "constitutional-ai"
   ],
   "author": "Luca Rossignoli",
   "license": "UNLICENSED",

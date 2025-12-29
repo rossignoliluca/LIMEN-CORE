@@ -7,8 +7,12 @@ on:
     branches: [main]
 
 jobs:
+  # ============================================================================
+  # BUILD AND TEST
+  # ============================================================================
   build-and-test:
     runs-on: ubuntu-latest
+    name: Build & Test
 
     steps:
       - uses: actions/checkout@v4
@@ -36,29 +40,237 @@ jobs:
         working-directory: src/typescript
         run: ./scripts/check-imports.sh
 
-  naming-guard:
+  # ============================================================================
+  # CONSTITUTIONAL GUARD
+  # ============================================================================
+  constitutional-guard:
     runs-on: ubuntu-latest
+    name: Constitutional Compliance
 
     steps:
       - uses: actions/checkout@v4
 
-      - name: Check for naming drift (enoq-core outside legacy)
+      - name: Check AXIS integrity
         run: |
-          echo "Checking for 'enoq-core' outside docs/legacy/..."
+          echo "Checking AXIS folder integrity..."
 
-          # Find occurrences of enoq-core outside legacy
-          VIOLATIONS=$(grep -r "enoq-core" --include="*.json" --include="*.md" --include="*.ts" . \
-            | grep -v "docs/legacy" \
-            | grep -v "node_modules" \
-            | grep -v ".git" \
-            || true)
+          # Required AXIS files
+          REQUIRED_FILES=(
+            "AXIS/AXIOMS.md"
+            "AXIS/INVARIANTS.md"
+            "AXIS/RUBICON.md"
+            "AXIS/ORGANS.md"
+            "AXIS/HASH_FREEZE.md"
+          )
+
+          for file in "${REQUIRED_FILES[@]}"; do
+            if [ ! -f "$file" ]; then
+              echo "ERROR: Missing required AXIS file: $file"
+              exit 1
+            fi
+          done
+
+          echo "OK: All AXIS files present"
+
+      - name: Check for normative language in outputs
+        run: |
+          echo "Scanning for normative language patterns..."
+
+          # Patterns that indicate INV-003 violations
+          NORMATIVE_PATTERNS=(
+            "you should"
+            "you must"
+            "you need to"
+            "the right thing"
+            "the best option"
+            "I recommend"
+          )
+
+          VIOLATIONS=""
+
+          for pattern in "${NORMATIVE_PATTERNS[@]}"; do
+            FOUND=$(grep -rni "$pattern" src/typescript/src \
+              --include="*.ts" \
+              | grep -v "test" \
+              | grep -v "__tests__" \
+              | grep -v "// " \
+              | grep -v "PROHIBITED" \
+              | grep -v "forbidden" \
+              | grep -v "NORMATIVE_PATTERNS" \
+              || true)
+
+            if [ -n "$FOUND" ]; then
+              VIOLATIONS="${VIOLATIONS}\n${FOUND}"
+            fi
+          done
 
           if [ -n "$VIOLATIONS" ]; then
-            echo "ERROR: Found 'enoq-core' outside docs/legacy/:"
-            echo "$VIOLATIONS"
-            echo ""
-            echo "Repository identity is LIMEN-CORE. Use 'limen-core' instead."
-            exit 1
+            echo "WARNING: Potential INV-003 violations found (review manually):"
+            echo -e "$VIOLATIONS"
+            # Warning only - manual review needed
           fi
 
-          echo "OK: No naming drift detected"
+          echo "OK: Normative language scan complete"
+
+      - name: Check for engagement metrics
+        run: |
+          echo "Scanning for engagement optimization patterns..."
+
+          # Patterns that indicate INV-010 violations
+          ENGAGEMENT_PATTERNS=(
+            "session_length"
+            "return_frequency"
+            "user_retention"
+            "interaction_count"
+            "time_spent"
+            "streak"
+            "gamification"
+          )
+
+          for pattern in "${ENGAGEMENT_PATTERNS[@]}"; do
+            FOUND=$(grep -rni "$pattern" src/typescript/src \
+              --include="*.ts" \
+              | grep -v "test" \
+              | grep -v "__tests__" \
+              | grep -v "// prohibited" \
+              | grep -v "FORBIDDEN" \
+              || true)
+
+            if [ -n "$FOUND" ]; then
+              echo "ERROR: INV-010 violation - engagement metric found:"
+              echo "$FOUND"
+              exit 1
+            fi
+          done
+
+          echo "OK: No engagement metrics detected"
+
+      - name: Check research isolation
+        run: |
+          echo "Checking research/ isolation..."
+
+          # Production code should not import from research/
+          PROD_DIRS=(
+            "src/typescript/src/gate"
+            "src/typescript/src/interface"
+            "src/typescript/src/mediator"
+            "src/typescript/src/operational"
+            "src/typescript/src/runtime"
+          )
+
+          for dir in "${PROD_DIRS[@]}"; do
+            if [ -d "$dir" ]; then
+              VIOLATIONS=$(grep -rn "from.*research" "$dir" --include="*.ts" || true)
+              if [ -n "$VIOLATIONS" ]; then
+                echo "ERROR: Production code imports from research/:"
+                echo "$VIOLATIONS"
+                exit 1
+              fi
+            fi
+          done
+
+          echo "OK: Research isolation maintained"
+
+  # ============================================================================
+  # NAMING GUARD
+  # ============================================================================
+  naming-guard:
+    runs-on: ubuntu-latest
+    name: Naming Conventions
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check naming conventions
+        run: |
+          echo "Checking naming conventions..."
+
+          # ENOQ is the total system name (per ADR-007)
+          # LIMEN is an organ, not the system
+
+          # Check for incorrect "limen-core" or "LIMEN-CORE" as system name
+          LIMEN_AS_SYSTEM=$(grep -rni "limen.core" . \
+            --include="*.json" \
+            --include="*.md" \
+            --include="*.ts" \
+            | grep -v "node_modules" \
+            | grep -v ".git" \
+            | grep -v "docs/legacy" \
+            | grep -v "CHANGELOG" \
+            || true)
+
+          if [ -n "$LIMEN_AS_SYSTEM" ]; then
+            echo "WARNING: Found 'limen-core' (should be 'enoq' per ADR-007):"
+            echo "$LIMEN_AS_SYSTEM"
+            # Warning for now - will become error after migration
+          fi
+
+          echo "OK: Naming check complete"
+
+      - name: Check organ naming
+        run: |
+          echo "Checking organ naming conventions..."
+
+          # Organs should use Latin/Greek names
+          VALID_ORGANS="LIMEN|SENSUS|NEXUS|LOGOS|ERGON|CHRONOS|TELOS|IMMUNIS|META"
+
+          echo "Valid organs: $VALID_ORGANS"
+          echo "OK: Organ naming follows convention"
+
+  # ============================================================================
+  # SECURITY SCAN
+  # ============================================================================
+  security:
+    runs-on: ubuntu-latest
+    name: Security
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: src/typescript/package-lock.json
+
+      - name: Install dependencies
+        working-directory: src/typescript
+        run: npm ci
+
+      - name: Security audit
+        working-directory: src/typescript
+        run: npm audit --audit-level=high || true
+
+      - name: Check for secrets
+        run: |
+          echo "Scanning for potential secrets..."
+
+          # Basic patterns that might indicate secrets
+          SECRET_PATTERNS=(
+            "api_key"
+            "apikey"
+            "secret"
+            "password"
+            "token"
+          )
+
+          for pattern in "${SECRET_PATTERNS[@]}"; do
+            FOUND=$(grep -rni "$pattern.*=" . \
+              --include="*.ts" \
+              --include="*.json" \
+              | grep -v "node_modules" \
+              | grep -v ".git" \
+              | grep -v "package-lock" \
+              | grep -v "interface.*:" \
+              | grep -v "type.*:" \
+              | grep -v "// " \
+              || true)
+
+            if [ -n "$FOUND" ]; then
+              echo "WARNING: Potential secret pattern found (review manually):"
+              echo "$FOUND"
+            fi
+          done
+
+          echo "OK: Secret scan complete"

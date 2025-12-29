@@ -1,0 +1,106 @@
+# ENOQ CODEOWNERS
+#
+# This file defines who must review changes to specific parts of the codebase.
+# Changes to AXIS (constitutional ground) require Architecture Board approval.
+#
+# Format: <pattern> <owner> [<owner>...]
+# See: https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+
+# ============================================================================
+# FROZEN ZONE - Requires Architecture Board
+# ============================================================================
+
+# AXIS (Constitutional Ground) - FROZEN
+# Any change to axioms, invariants, or organs requires supermajority approval
+/AXIS/                                     @enoq/architecture-board
+
+# Constitutional documentation
+/docs/CONSTITUTION.md                      @enoq/architecture-board
+/docs/ARCHITECTURE_TOTAL.md                @enoq/architecture-board
+
+# ADRs (Architecture Decision Records)
+/src/typescript/docs/decisions/            @enoq/architecture-board
+
+# ============================================================================
+# GATE MODULE - Requires Gate Maintainers
+# ============================================================================
+
+# Core classifier (safety-critical)
+/src/typescript/src/gate/classifier/       @enoq/gate-maintainers
+
+# Response protocols
+/src/typescript/src/gate/protocols/        @enoq/gate-maintainers
+
+# Verification (S5_VERIFY)
+/src/typescript/src/gate/verification/     @enoq/gate-maintainers
+
+# Enforcement
+/src/typescript/src/gate/enforcement/      @enoq/gate-maintainers
+
+# Withdrawal
+/src/typescript/src/gate/withdrawal/       @enoq/gate-maintainers
+
+# Invariants
+/src/typescript/src/gate/invariants/       @enoq/architecture-board
+
+# ============================================================================
+# INTERFACE MODULE - Requires Type Maintainers
+# ============================================================================
+
+# Core types (breaking changes affect all)
+/src/typescript/src/interface/             @enoq/type-maintainers
+
+# ============================================================================
+# OPERATIONAL MODULE
+# ============================================================================
+
+# Detectors
+/src/typescript/src/operational/detectors/ @enoq/core-maintainers
+
+# Gating strategies
+/src/typescript/src/operational/gating/    @enoq/core-maintainers
+
+# ============================================================================
+# MEDIATOR MODULE
+# ============================================================================
+
+# Cognitive layers
+/src/typescript/src/mediator/              @enoq/core-maintainers
+
+# Meta kernel (power governance)
+/src/typescript/src/mediator/l3_integrate/meta_kernel.ts @enoq/architecture-board
+
+# ============================================================================
+# RUNTIME MODULE
+# ============================================================================
+
+# Pipeline (main orchestrator)
+/src/typescript/src/runtime/pipeline/      @enoq/core-maintainers
+
+# ============================================================================
+# RESEARCH MODULE - Open for experimentation
+# ============================================================================
+
+# Research is open - anyone can contribute
+# But promoting to production requires gate-maintainers review
+/src/typescript/src/research/              @enoq/contributors
+
+# ============================================================================
+# CI/CD AND GOVERNANCE
+# ============================================================================
+
+# GitHub workflows
+/.github/workflows/                         @enoq/devops
+
+# This file
+/.github/CODEOWNERS                         @enoq/architecture-board
+
+# Package configuration
+/src/typescript/package.json                @enoq/core-maintainers
+
+# ============================================================================
+# DEFAULT
+# ============================================================================
+
+# Everything else requires at least one core maintainer
+*                                           @enoq/core-maintainers
