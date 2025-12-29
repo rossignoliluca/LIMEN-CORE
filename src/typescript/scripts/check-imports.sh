@@ -4,16 +4,18 @@
 # ============================================
 # Enforces architectural boundaries:
 #   interface/  -> cannot import from anything (pure types)
-#   gate/       -> imports interface/ only (+ allowed exceptions below)
+#   gate/       -> imports interface/ only
 #   operational/ -> imports interface/, gate/
 #   mediator/   -> imports interface/, gate/, operational/
 #   runtime/    -> imports interface/, gate/, operational/, mediator/
 #   research/   -> isolated (cannot be imported by production code)
 #
+# QUARANTINE RULE:
+#   runtime/quarantine/ is the ONLY place that may import from research/
+#   It is EXCLUDED from production build (see tsconfig.json)
+#
 # ALLOWED EXCEPTIONS (documented architectural coupling):
 #   - gate/verification/ may import ResponsePlan from mediator/l5_transform/
-#   - gate/withdrawal/ may import ResponsePlan from mediator/l5_transform/
-#   - operational/signals/ may import ResponsePlan from mediator/l5_transform/
 # ============================================
 
 set -e
@@ -26,18 +28,18 @@ echo "Checking import boundaries..."
 echo ""
 
 # Rule 1: gate/ cannot import from runtime/, research/
-echo "[1/5] Checking gate/ strict boundaries..."
+echo "[1/6] Checking gate/ strict boundaries..."
 VIOLATIONS=$(grep -r "from '.*runtime\|from '.*research" src/gate/ 2>/dev/null || true)
 if [ -n "$VIOLATIONS" ]; then
     echo "  ERROR: gate/ imports from runtime/ or research/:"
     echo "$VIOLATIONS" | head -20
     ERRORS=$((ERRORS + 1))
 else
-    echo "  OK (runtime/research isolation)"
+    echo "  OK"
 fi
 
 # Rule 2: operational/ should not import from runtime/, research/
-echo "[2/5] Checking operational/ boundaries..."
+echo "[2/6] Checking operational/ boundaries..."
 VIOLATIONS=$(grep -r "from '.*runtime\|from '.*research" src/operational/ 2>/dev/null || true)
 if [ -n "$VIOLATIONS" ]; then
     echo "  ERROR: operational/ imports from runtime/ or research/:"
@@ -48,32 +50,50 @@ else
 fi
 
 # Rule 3: mediator/ should not import from runtime/, research/
-echo "[3/5] Checking mediator/ boundaries..."
-VIOLATIONS=$(grep -r "from '.*runtime\|from '.*research" src/mediator/ 2>/dev/null | grep -v "concrescence_engine" | grep -v "agent_swarm" || true)
+# KNOWN EXCEPTION: concrescence_engine imports from runtime/pipeline (circular - to refactor)
+echo "[3/6] Checking mediator/ boundaries..."
+VIOLATIONS=$(grep -r "from '.*runtime\|from '.*research" src/mediator/ 2>/dev/null | grep -v "concrescence_engine" || true)
 if [ -n "$VIOLATIONS" ]; then
-    echo "  WARNING: mediator/ imports from runtime/ or research/:"
-    echo "$VIOLATIONS" | head -10
-    WARNINGS=$((WARNINGS + 1))
+    echo "  ERROR: mediator/ imports from runtime/ or research/:"
+    echo "$VIOLATIONS" | head -20
+    ERRORS=$((ERRORS + 1))
 else
-    echo "  OK (with known exceptions)"
+    # Check for known exception
+    KNOWN=$(grep -r "from '.*runtime" src/mediator/concrescence/concrescence_engine.ts 2>/dev/null || true)
+    if [ -n "$KNOWN" ]; then
+        echo "  OK (with known exception: concrescence_engine -> runtime/pipeline)"
+        echo "  TODO: Refactor to break circular dependency"
+    else
+        echo "  OK"
+    fi
 fi
 
-# Rule 4: runtime/ should not import from research/
-echo "[4/5] Checking runtime/ research isolation..."
-VIOLATIONS=$(grep -r "from '.*research" src/runtime/ 2>/dev/null || true)
+# Rule 4: runtime/ (EXCEPT quarantine/) must NOT import from research/
+echo "[4/6] Checking runtime/ research isolation (excluding quarantine/)..."
+VIOLATIONS=$(grep -r "from '.*research" src/runtime/pipeline/ src/runtime/io/ 2>/dev/null || true)
 if [ -n "$VIOLATIONS" ]; then
-    echo "  WARNING: runtime/ imports from research/ (field_integration exception):"
-    echo "$VIOLATIONS" | head -10
-    WARNINGS=$((WARNINGS + 1))
+    echo "  ERROR: runtime/ (non-quarantine) imports from research/:"
+    echo "$VIOLATIONS" | head -20
+    ERRORS=$((ERRORS + 1))
 else
     echo "  OK"
 fi
 
-# Rule 5: No production code should import from research/ (except runtime/pipeline for field_integration)
-echo "[5/5] Checking research/ isolation..."
+# Rule 5: runtime/quarantine/ MAY import from research/ (this is allowed)
+echo "[5/6] Checking runtime/quarantine/ (bridge to research)..."
+QUARANTINE_IMPORTS=$(grep -r "from '.*research" src/runtime/quarantine/ 2>/dev/null || true)
+if [ -n "$QUARANTINE_IMPORTS" ]; then
+    echo "  OK (quarantine imports from research - allowed)"
+    echo "  NOTE: quarantine/ is excluded from production build"
+else
+    echo "  OK (no research imports in quarantine)"
+fi
+
+# Rule 6: research/ must not be imported by gate/, operational/, mediator/
+echo "[6/6] Checking research/ isolation..."
 VIOLATIONS=$(grep -rE "from ['\"].*research" src/gate/ src/operational/ src/mediator/ 2>/dev/null | grep -v "node_modules" || true)
 if [ -n "$VIOLATIONS" ]; then
-    echo "  ERROR: gate/operational/mediator imports from research/:"
+    echo "  ERROR: production code imports from research/:"
     echo "$VIOLATIONS" | head -20
     ERRORS=$((ERRORS + 1))
 else
@@ -82,10 +102,10 @@ fi
 
 echo ""
 echo "============================================"
-echo "KNOWN ARCHITECTURAL COUPLING (documented):"
-echo "  - gate/verification/ -> mediator/.../response_plan (builder functions only)"
-echo "  - mediator/concrescence/ -> runtime/pipeline (circular: to refactor)"
-echo "  - runtime/experimental/ <- research/genesis (field_integration bridge)"
+echo "QUARANTINE RULE:"
+echo "  - runtime/quarantine/ is the ONLY bridge to research/"
+echo "  - It is EXCLUDED from production build (tsconfig.json)"
+echo "  - Use for experimental integrations only"
 echo "============================================"
 echo ""
 
@@ -93,7 +113,7 @@ if [ $ERRORS -gt 0 ]; then
     echo "FAILED: $ERRORS boundary violation(s) found"
     exit 1
 elif [ $WARNINGS -gt 0 ]; then
-    echo "PASSED with $WARNINGS warning(s) (known exceptions)"
+    echo "PASSED with $WARNINGS warning(s)"
     exit 0
 else
     echo "PASSED: All import boundaries respected"

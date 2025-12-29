@@ -61,8 +61,15 @@ src/
 ├── operational/   # Detection, gating, signals
 ├── mediator/      # Pure transformations
 ├── runtime/       # Pipeline orchestration, IO
-├── research/      # Experiments (isolated)
+│   └── quarantine/  # Bridge to research (excluded from build)
+├── research/      # Experiments (never in production build)
 └── benchmarks/    # Performance tests
 ```
+
+### Quarantine Rule
+
+`runtime/quarantine/` is the ONLY place that may import from `research/`.
+It is **excluded from production build** (see tsconfig.json).
+Use for experimental integrations that need research code.
 
 See `docs/ARCHITECTURE.md` for full system documentation.
