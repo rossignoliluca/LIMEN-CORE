@@ -1,4 +1,6 @@
 /**
+ * @deprecated DO NOT EDIT - Legacy file, see experimental/legacy/README.md
+ *
  * LIMEN HYBRID DIMENSIONAL DETECTOR
  *
  * Combines SOTA (embedding-based) detector with regex fallback.

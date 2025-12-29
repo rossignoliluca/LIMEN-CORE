@@ -1,4 +1,6 @@
 /**
+ * @deprecated DO NOT EDIT - Legacy file, see experimental/legacy/README.md
+ *
  * LLM DETECTOR V2 - EarlySignals Contributor
  *
  * PRINCIPIO FONDAMENTALE: "classifica regime, non contenuto"

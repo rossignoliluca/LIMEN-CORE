@@ -1,4 +1,6 @@
 /**
+ * @deprecated DO NOT EDIT - Legacy file, see experimental/legacy/README.md
+ *
  * LLM-POWERED DIMENSIONAL DETECTOR
  *
  * Uses LLM to semantically understand user input and classify it

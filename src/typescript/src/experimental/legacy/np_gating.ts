@@ -1,4 +1,6 @@
 /**
+ * @deprecated DO NOT EDIT - Legacy file, see experimental/legacy/README.md
+ *
  * NP-CALIBRATED GATING - v5.0 Runtime Component
  *
  * Origin: research module (now canonical)

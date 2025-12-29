@@ -1,4 +1,6 @@
 /**
+ * @deprecated DO NOT EDIT - Legacy file, see experimental/legacy/README.md
+ *
  * LIMEN L1 SELECTION
  * 
  * Maps Field State to Protocol Selection.

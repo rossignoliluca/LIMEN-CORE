@@ -1,4 +1,6 @@
 /**
+ * @deprecated DO NOT EDIT - Legacy file, see experimental/legacy/README.md
+ *
  * SCIENTIFIC GATING - v4.0 Runtime Component
  *
  * Cost-sensitive selective classification based on Chow's Rule:

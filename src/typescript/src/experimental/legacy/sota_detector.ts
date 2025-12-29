@@ -1,4 +1,6 @@
 /**
+ * @deprecated DO NOT EDIT - Legacy file, see experimental/legacy/README.md
+ *
  * SOTA DIMENSIONAL DETECTOR
  *
  * State-of-the-art detection based on 2024 research:
