@@ -182,6 +182,140 @@ fi
 echo ""
 
 # ============================================
+# CHECK 4: Content Compliance (P2.4)
+# ============================================
+
+echo "▶ Check 4: Content Compliance Patterns"
+
+CONTENT_COMPLIANCE="$SRC_DIR/gate/verification/content_compliance.ts"
+
+# 4a: NORMATIVE patterns exist
+echo "  - NORMATIVE patterns ... "
+if grep -q "NORMATIVE" "$CONTENT_COMPLIANCE" 2>/dev/null; then
+  echo "    ✓ PRESENT"
+else
+  echo "    ✗ FAIL: NORMATIVE patterns not found in content_compliance"
+  PASS=false
+  VIOLATIONS="$VIOLATIONS\n- content_compliance missing NORMATIVE patterns"
+fi
+
+# 4b: RANKING patterns exist
+echo "  - RANKING patterns ... "
+if grep -q "RANKING" "$CONTENT_COMPLIANCE" 2>/dev/null; then
+  echo "    ✓ PRESENT"
+else
+  echo "    ✗ FAIL: RANKING patterns not found in content_compliance"
+  PASS=false
+  VIOLATIONS="$VIOLATIONS\n- content_compliance missing RANKING patterns"
+fi
+
+# 4c: ENGAGEMENT patterns exist
+echo "  - ENGAGEMENT patterns ... "
+if grep -q "ENGAGEMENT" "$CONTENT_COMPLIANCE" 2>/dev/null; then
+  echo "    ✓ PRESENT"
+else
+  echo "    ✗ FAIL: ENGAGEMENT patterns not found in content_compliance"
+  PASS=false
+  VIOLATIONS="$VIOLATIONS\n- content_compliance missing ENGAGEMENT patterns"
+fi
+
+# 4d: checkCompliance export exists
+echo "  - checkCompliance() export ... "
+if grep -q "export.*checkCompliance" "$CONTENT_COMPLIANCE" 2>/dev/null; then
+  echo "    ✓ PRESENT"
+else
+  echo "    ✗ FAIL: checkCompliance not exported from content_compliance"
+  PASS=false
+  VIOLATIONS="$VIOLATIONS\n- content_compliance missing checkCompliance export"
+fi
+
+echo ""
+
+# ============================================
+# CHECK 5: Observability (P2.4)
+# ============================================
+
+echo "▶ Check 5: Observability Integration"
+
+OBSERVABILITY="$SRC_DIR/core/signals/observability.ts"
+
+# 5a: Event types exist
+echo "  - Event types ... "
+if grep -q "BOUNDARY_BLOCKED\|VERIFY_FAILED\|RUBICON_WITHDRAW\|PROVIDER_FAILOVER" "$OBSERVABILITY" 2>/dev/null; then
+  echo "    ✓ PRESENT"
+else
+  echo "    ✗ FAIL: Required event types not found in observability"
+  PASS=false
+  VIOLATIONS="$VIOLATIONS\n- observability missing required event types"
+fi
+
+# 5b: getMetrics export exists
+echo "  - getMetrics() export ... "
+if grep -q "export.*getObserver\|export.*getMetrics" "$OBSERVABILITY" 2>/dev/null; then
+  echo "    ✓ PRESENT"
+else
+  echo "    ✗ FAIL: getObserver/getMetrics not exported from observability"
+  PASS=false
+  VIOLATIONS="$VIOLATIONS\n- observability missing metrics export"
+fi
+
+# 5c: Orchestrator uses observability
+echo "  - Orchestrator observability integration ... "
+if grep -q "emitPipelineStart\|emitPipelineEnd" "$ORCHESTRATOR" 2>/dev/null; then
+  echo "    ✓ PRESENT"
+else
+  echo "    ✗ FAIL: Orchestrator not using observability emit functions"
+  PASS=false
+  VIOLATIONS="$VIOLATIONS\n- orchestrator missing observability integration"
+fi
+
+echo ""
+
+# ============================================
+# CHECK 6: Additional Forbidden Imports (P2.4)
+# ============================================
+
+echo "▶ Check 6: Additional Forbidden Imports"
+
+# 6a: mediator/ cannot import from operational/gating
+echo "  - mediator/ → operational/gating/ ... "
+MATCHES=$(grep -r "from.*['\"].*operational/gating" "$SRC_DIR/mediator" 2>/dev/null | grep -v "node_modules" || true)
+if [ -n "$MATCHES" ]; then
+  echo "$MATCHES" | head -3
+  echo "    ✗ FAIL: mediator/ imports from operational/gating/"
+  PASS=false
+  VIOLATIONS="$VIOLATIONS\n- mediator/ imports from operational/gating/"
+else
+  echo "    ✓ CLEAN"
+fi
+
+# 6b: gate/verification cannot import from mediator
+echo "  - gate/verification/ → mediator/ ... "
+MATCHES=$(grep -r "from.*['\"].*mediator" "$SRC_DIR/gate/verification" 2>/dev/null | grep -v "node_modules" || true)
+if [ -n "$MATCHES" ]; then
+  echo "$MATCHES" | head -3
+  echo "    ✗ FAIL: gate/verification/ imports from mediator/"
+  PASS=false
+  VIOLATIONS="$VIOLATIONS\n- gate/verification/ imports from mediator/"
+else
+  echo "    ✓ CLEAN"
+fi
+
+# 6c: core/signals cannot import from experimental
+echo "  - core/signals/ → experimental/ ... "
+MATCHES=$(grep -r "from.*['\"].*experimental" "$SRC_DIR/core/signals" 2>/dev/null | grep -v "node_modules" || true)
+if [ -n "$MATCHES" ]; then
+  echo "$MATCHES" | head -3
+  echo "    ✗ FAIL: core/signals/ imports from experimental/"
+  PASS=false
+  VIOLATIONS="$VIOLATIONS\n- core/signals/ imports from experimental/"
+else
+  echo "    ✓ CLEAN"
+fi
+
+echo ""
+
+# ============================================
 # RESULT
 # ============================================
 
