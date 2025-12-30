@@ -12,6 +12,13 @@
 
 import { SupportedLanguage, CULTURE_PROFILES } from '../../interface/types';
 import { validateResponse as axisValidate, AxisDecision } from '../../gate/invariants/axis';
+import {
+  EnoqAPIError,
+  EnoqConfigError,
+  ENOQ_ERROR_CODES,
+  apiKeyMissingError,
+  apiRequestError,
+} from '../../interface/errors';
 
 // ============================================
 // TYPES
@@ -118,8 +125,8 @@ async function callOpenAI(
   });
   
   if (!response.ok) {
-    const error = await response.text();
-    throw new Error(`OpenAI API error: ${response.status} - ${error}`);
+    const errorText = await response.text();
+    throw apiRequestError('openai', response.status, errorText);
   }
   
   const data = await response.json() as {
@@ -179,8 +186,8 @@ async function callAnthropic(
   });
   
   if (!response.ok) {
-    const error = await response.text();
-    throw new Error(`Anthropic API error: ${response.status} - ${error}`);
+    const errorText = await response.text();
+    throw apiRequestError('anthropic', response.status, errorText);
   }
   
   const data = await response.json() as {
@@ -209,37 +216,152 @@ function mapToAnthropicModel(model: LLMModel): string {
 // MAIN LLM FUNCTION
 // ============================================
 
+export interface CallLLMOptions {
+  /** Preferred provider to try first */
+  preferredProvider?: LLMProvider;
+  /** Enable fallback to secondary provider on failure (default: true) */
+  enableFallback?: boolean;
+  /** Maximum attempts per provider before giving up */
+  maxRetries?: number;
+}
+
+/**
+ * Call LLM with automatic fallback chain
+ *
+ * Default order: Anthropic → OpenAI (if both configured)
+ * Falls back to secondary provider on:
+ * - Network errors
+ * - 5xx server errors
+ * - Rate limiting (429)
+ *
+ * Does NOT fallback on:
+ * - 4xx client errors (except 429)
+ * - Validation errors
+ */
 export async function callLLM(
   request: LLMRequest,
-  preferredProvider?: LLMProvider
+  options: CallLLMOptions | LLMProvider = {}
 ): Promise<LLMResponse> {
+  // Support legacy signature: callLLM(request, 'openai')
+  const opts: CallLLMOptions = typeof options === 'string'
+    ? { preferredProvider: options }
+    : options;
+
+  const { preferredProvider, enableFallback = true } = opts;
   const config = getConfig();
-  
-  // Determine which provider to use
-  let provider: LLMProvider;
-  let providerConfig: LLMConfig;
-  
-  if (preferredProvider && config[preferredProvider]) {
-    provider = preferredProvider;
-    providerConfig = config[preferredProvider]!;
-  } else if (config.openai) {
-    provider = 'openai';
-    providerConfig = config.openai;
-  } else if (config.anthropic) {
-    provider = 'anthropic';
-    providerConfig = config.anthropic;
-  } else {
-    throw new Error(
-      'No LLM API key found. Set OPENAI_API_KEY or ANTHROPIC_API_KEY environment variable.'
+
+  // Build provider chain (primary first, then fallback)
+  const chain = buildProviderChain(config, preferredProvider);
+
+  if (chain.length === 0) {
+    throw new EnoqConfigError(
+      'No LLM API key found. Set OPENAI_API_KEY or ANTHROPIC_API_KEY environment variable.',
+      ENOQ_ERROR_CODES.API_KEY_MISSING
     );
   }
-  
-  // Call appropriate provider
-  if (provider === 'openai') {
-    return callOpenAI(providerConfig, request);
-  } else {
-    return callAnthropic(providerConfig, request);
+
+  let lastError: Error | undefined;
+
+  // Try each provider in chain
+  for (let i = 0; i < chain.length; i++) {
+    const { provider, providerConfig } = chain[i];
+    const isLastProvider = i === chain.length - 1;
+
+    try {
+      if (provider === 'openai') {
+        return await callOpenAI(providerConfig, request);
+      } else {
+        return await callAnthropic(providerConfig, request);
+      }
+    } catch (error) {
+      lastError = error as Error;
+
+      // Log the failure
+      if (process.env.ENOQ_DEBUG) {
+        console.warn(`[LLM] ${provider} failed:`, (error as Error).message);
+      }
+
+      // If fallback disabled or this is the last provider, throw
+      if (!enableFallback || isLastProvider) {
+        throw error;
+      }
+
+      // Check if error is recoverable (should try fallback)
+      if (!shouldFallback(error)) {
+        throw error;
+      }
+
+      // Continue to next provider in chain
+      if (process.env.ENOQ_DEBUG) {
+        console.log(`[LLM] Falling back to ${chain[i + 1]?.provider}`);
+      }
+    }
   }
+
+  // Should never reach here, but throw last error if we do
+  throw lastError || new EnoqConfigError(
+    'LLM call failed unexpectedly',
+    ENOQ_ERROR_CODES.PIPELINE_EXECUTION
+  );
+}
+
+/**
+ * Build ordered provider chain based on config and preference
+ * Default order: Anthropic first (better for nuanced responses), OpenAI as fallback
+ */
+function buildProviderChain(
+  config: ReturnType<typeof getConfig>,
+  preferredProvider?: LLMProvider
+): Array<{ provider: LLMProvider; providerConfig: LLMConfig }> {
+  const chain: Array<{ provider: LLMProvider; providerConfig: LLMConfig }> = [];
+
+  // If preferred provider specified and available, use it first
+  if (preferredProvider && config[preferredProvider]) {
+    chain.push({
+      provider: preferredProvider,
+      providerConfig: config[preferredProvider]!,
+    });
+  }
+
+  // Default order: anthropic → openai
+  const defaultOrder: LLMProvider[] = ['anthropic', 'openai'];
+
+  for (const provider of defaultOrder) {
+    // Skip if already added as preferred
+    if (chain.some(c => c.provider === provider)) continue;
+
+    if (config[provider]) {
+      chain.push({
+        provider,
+        providerConfig: config[provider]!,
+      });
+    }
+  }
+
+  return chain;
+}
+
+/**
+ * Determine if we should fallback on this error
+ */
+function shouldFallback(error: unknown): boolean {
+  // Always fallback on network errors
+  if (error instanceof TypeError) return true;
+
+  // For API errors, check status code
+  if (error instanceof EnoqAPIError) {
+    const status = error.statusCode;
+    if (!status) return true; // Network error
+
+    // Fallback on server errors (5xx) and rate limiting (429)
+    if (status >= 500 || status === 429) return true;
+
+    // Don't fallback on other client errors (4xx)
+    return false;
+  }
+
+  // For generic errors, try fallback
+  return true;
 }
 
 // ============================================
