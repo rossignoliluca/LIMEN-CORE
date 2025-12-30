@@ -63,6 +63,42 @@ else
   echo "    ✓ CLEAN"
 fi
 
+# 1d: runtime/ cannot import from experimental/ (v7.2)
+echo "  - runtime/ → experimental/ ... "
+MATCHES=$(grep -r "from.*['\"].*experimental" "$SRC_DIR/runtime" 2>/dev/null | grep -v "node_modules" || true)
+if [ -n "$MATCHES" ]; then
+  echo "$MATCHES" | head -3
+  echo "    ✗ FAIL: runtime/ imports from experimental/"
+  PASS=false
+  VIOLATIONS="$VIOLATIONS\n- runtime/ imports from experimental/"
+else
+  echo "    ✓ CLEAN"
+fi
+
+# 1e: operational/ cannot import from experimental/ (v7.2)
+echo "  - operational/ → experimental/ ... "
+MATCHES=$(grep -r "from.*['\"].*experimental" "$SRC_DIR/operational" 2>/dev/null | grep -v "node_modules" || true)
+if [ -n "$MATCHES" ]; then
+  echo "$MATCHES" | head -3
+  echo "    ✗ FAIL: operational/ imports from experimental/"
+  PASS=false
+  VIOLATIONS="$VIOLATIONS\n- operational/ imports from experimental/"
+else
+  echo "    ✓ CLEAN"
+fi
+
+# 1f: gate/ cannot import from mediator/ (v7.2)
+echo "  - gate/ → mediator/ ... "
+MATCHES=$(grep -r "from.*['\"].*mediator" "$SRC_DIR/gate" 2>/dev/null | grep -v "node_modules" || true)
+if [ -n "$MATCHES" ]; then
+  echo "$MATCHES" | head -3
+  echo "    ✗ FAIL: gate/ imports from mediator/"
+  PASS=false
+  VIOLATIONS="$VIOLATIONS\n- gate/ imports from mediator/"
+else
+  echo "    ✓ CLEAN"
+fi
+
 echo ""
 
 # ============================================

@@ -135,6 +135,7 @@ npx ts-node src/runtime/io/interactive_session.ts
 
 | Version | Date | Changes |
 |---------|------|---------|
+| **v7.2** | 2025-12-30 | P0 stabilization: 58 new tests, import fixes, axis-check extended |
 | **v7.1** | 2025-12-30 | DECISION traversal: third crossing through geometry |
 | **v7.0.1** | 2025-12-30 | RELATION wording fix: responsibility returns to A |
 | **v7.0** | 2025-12-30 | RELATION traversal: second crossing through geometry |
@@ -154,6 +155,8 @@ npx ts-node src/runtime/io/interactive_session.ts
 | **v6.0** | 2025-12-29 | AXIS constitutional freeze (12 axioms, 11 invariants) |
 
 ### Recent Details
+
+**v7.2**: P0 stabilization - 58 new tests (orchestrator, pipeline, traversals), import violations fixed (runtime→experimental, operational→experimental, gate→mediator), axis-check extended (12 checks). Tests: 676/692.
 
 **v7.1**: DECISION traversal - clarifies decisions: `npx ts-node src/surfaces/cli/decision.ts`. No recommendations. Rubicon detection (INV-009).
 

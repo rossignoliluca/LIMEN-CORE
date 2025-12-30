@@ -24,12 +24,12 @@ import {
   ForbiddenAction,
 } from '../../interface/types';
 
-// Builder functions from mediator (factory functions for fallback plans)
+// Builder functions from interface (pure factory functions)
 import {
   createDefaultPlan,
   createEmergencyPlan,
   createVModePlan,
-} from '../../mediator/l5_transform/response_plan';
+} from '../../interface/plan_builders';
 
 // Signals from operational
 import { EarlySignals } from '../../operational/signals/early_signals';
